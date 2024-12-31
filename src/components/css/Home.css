@@ -1,0 +1,35 @@
+.simulationCon{
+    width: 80%;
+    height: 85vh;
+    margin: auto;
+    margin-top: 3.55%;
+    background-color: lightblue;
+    display: flex;
+    justify-content: space-between; 
+    padding: 5px; 
+    border-radius: 5px;
+}
+
+.mapsCon {
+    flex: 1; 
+    height: 100%;
+}
+
+.mapsCon > div {
+    width: 99.3%;
+    height: 85vh;
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+}
+
+.instructionCon {
+    padding: 10px;
+    overflow-y: auto; 
+}
+
+.instructionCon{
+    width: 20%;
+    height: 81.5vh;
+    background-color: white;
+}
