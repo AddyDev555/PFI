@@ -5,9 +5,12 @@ const { BaseLayer } = LayersControl;
 
 
 export default function Map() {
+    const indiaCenter = [20.5937, 78.9629];
+    const indiaBounds = [[6.0, 68.0], [40.0, 97.0]];
+    
     return (
         <div>
-            <MapContainer center={[31.725103574752296, 77.75242910485976]} zoom={5} style={{ height: '85vh', width: '100%' }} attributionControl={false}>
+            <MapContainer center={indiaCenter} zoom={4} minZoom={4} maxZoom={10} style={{ height: '85vh', width: '100%' }} attributionControl={false} maxBounds={indiaBounds}>
                 <LayersControl position="topright">
                     <BaseLayer checked name="Topographic 2">
                         <TileLayer
