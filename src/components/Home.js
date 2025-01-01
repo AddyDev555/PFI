@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import "./css/Home.css"
-import Map from './Map'
+import Main from './Main'
 
 export default function Home() {
     const [color, setColor] = useState("");
@@ -8,9 +8,6 @@ export default function Home() {
     return (
         <main>
             <div className="simulationCon">
-                <div className="mapsCon">
-                    <Map />
-                </div>
 
                 <div className="instructionCon">
                     <h1>Instructions</h1>
@@ -31,8 +28,14 @@ export default function Home() {
                             </div>
                         </div>
                     </div>
+                    Instructions go here!
                 </div>
+                
+                <div className="mainCon">
+                    <Main />
+                </div>
+
             </div>
         </main>
-    )
+    );
 }
