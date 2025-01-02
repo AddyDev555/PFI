@@ -7,6 +7,10 @@ import imageData from "../assets/imageData.json";
 export default function Main() {
     const mapRef = useRef(null);
     const [storedData, setStoredData] = useState([]);
+    const pointData = []; 
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
 
     const processImageData = async () => {
         const loadImage = (src) => {
@@ -28,6 +32,7 @@ export default function Main() {
         };
     
         const newStoredData = []; 
+        let index = 0;
     
         for (const data of imageData) {
           try {
@@ -37,8 +42,16 @@ export default function Main() {
             newStoredData.push({
               base64Image: base64,
               lat: data.lat,
-              lng: data.lng,
+              lng: data.lng
             });
+
+            pointData.push({
+              id: index,
+              x: 0,
+              y: 0
+            });
+
+            index++;
           } catch (error) {
             console.error("Error processing image:", error);
           }
@@ -49,6 +62,10 @@ export default function Main() {
 
     useEffect(() => {
         processImageData();
+    }, []);
+
+    useEffect(() => {
+
         const mapOptions = {
             center: [23.214981, 78.148069], 
             zoom: 4,
@@ -69,37 +86,98 @@ export default function Main() {
         const overlayCanvas = document.getElementById('overlayCanvas');
         const ctx = overlayCanvas.getContext('2d');
 
+        // Temp Zoom Logic 
         const resizeCanvas = () => {
             const size = map.getSize();
             overlayCanvas.width = size.x;
             overlayCanvas.height = size.y;
-            //drawImages(); 
+            drawImages(); 
         };
 
-        // overlayCanvas.addEventListener('pointerdown', function(e) { drawImages('pointerdown', e); });
-        // overlayCanvas.addEventListener('pointerup', function(e) { drawImages('pointerup', e); });
-        // overlayCanvas.addEventListener('touchmove', function(e) { if (e.touches.length === 1) { drawImages('touchmove', e); } });
-        // overlayCanvas.addEventListener('mousedown', function(e) { drawImages('movestart', e);});
-        // overlayCanvas.addEventListener('mouseup', function(e) { drawImages('moveend', e); });
+        const handleMove = (eventName, e) => {
+          try {
+              if (e && (e.originalEvent?.type || e.type)) {
+  
+                  const clientX = e.originalEvent?.clientX || e.clientX || e.changedTouches?.[0]?.clientX;
+                  const clientY = e.originalEvent?.clientY || e.clientY || e.changedTouches?.[0]?.clientY;
+  
+                  if (clientX !== undefined && clientY !== undefined) {
+  
+                      if (eventName === 'movestart' || eventName === 'pointerdown') {
+       
+                          startX = clientX;
+                          startY = clientY;
+                          isDragging = true;
+  
+                      } else if ((eventName === 'drag' || eventName === 'touchmove') && isDragging) {
+                          const dragDeltaX = clientX - startX;
+                          const dragDeltaY = clientY - startY;
+  
+                          pointData.forEach((data) => {
+                            data.x += dragDeltaX;
+                            data.y += dragDeltaY;
+                          });
 
-        // map.on('resize', resizeCanvas);
-        // map.on('drag', function(e) { drawImages('drag', e); });
+                          startX = clientX;
+                          startY = clientY;
+                      } else if (eventName === 'pointerup' || eventName === 'touchend') {
+                          isDragging = false;
+                      }
+                      
+                      drawImages();
+                  } 
+              }
+          } catch (error) {
+              console.error('Logging error:', error);
+          }
+        }
+
+        // Fixing Required Here: Give no image found error
+        const drawImages = () => {
+
+          ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        
+          pointData.forEach((data, index) => {
+            const imageData = storedData[index];
+            if (imageData && imageData.base64Image) {
+              const img = new Image();
+              img.src = imageData.base64Image;
+              img.onload = () => {
+                ctx.drawImage(img, data.x, data.y);
+              };
+              img.onerror = () => {
+                console.error(`Failed to load image for pointData index ${index}`);
+              };
+            } else {
+              console.error(`No image data found for index ${index}`);
+            }
+          });
+        };
+        
+        overlayCanvas.addEventListener('pointerdown', function(e) { handleMove('pointerdown', e); });
+        overlayCanvas.addEventListener('pointerup', function(e) { handleMove('pointerup', e); });
+        overlayCanvas.addEventListener('touchmove', function(e) { if (e.touches.length === 1) { handleMove('touchmove', e); } });
+        overlayCanvas.addEventListener('mousedown', function(e) { handleMove('movestart', e);});
+        overlayCanvas.addEventListener('mouseup', function(e) { handleMove('moveend', e); });
+
+        map.on('resize', resizeCanvas);
+        map.on('drag', function(e) { handleMove('drag', e); });
 
         resizeCanvas();
 
         return () => {
 
-            // if (overlayCanvas) {
+            if (overlayCanvas) {
                 
-            //     overlayCanvas.removeEventListener('pointerdown', function(e) { drawImages('pointerdown', e); });
-            //     overlayCanvas.removeEventListener('pointerup', function(e) { drawImages('pointerup', e); });
-            //     overlayCanvas.removeEventListener('touchmove', function(e) { drawImages('touchmove', e); });
-            //     overlayCanvas.removeEventListener('mousedown', function(e) { drawImages('movestart', e);});
-            //     overlayCanvas.removeEventListener('mouseup', function(e) { drawImages('moveend', e); });        
-            // }
+                overlayCanvas.removeEventListener('pointerdown', function(e) { handleMove('pointerdown', e); });
+                overlayCanvas.removeEventListener('pointerup', function(e) { handleMove('pointerup', e); });
+                overlayCanvas.removeEventListener('touchmove', function(e) { handleMove('touchmove', e); });
+                overlayCanvas.removeEventListener('mousedown', function(e) { handleMove('movestart', e);});
+                overlayCanvas.removeEventListener('mouseup', function(e) { handleMove('moveend', e); });        
+            }
 
-            // map.off('resize', resizeCanvas);
-            // map.remove();
+            map.off('resize', resizeCanvas);
+            map.remove();
         };
     }, []);
 
