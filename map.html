@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maharashtra Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@latest/dist/leaflet.css" />
-  <link rel="stylesheet" href="map.css" />
+  <link rel="stylesheet" href="C:\Users\OJAS\Desktop\OLABHackathon\PFI\map.css" />
+  <!--<link rel="stylesheet" href="map.css" />-->
 </head>
 <body>
     <div class="simulationCon">
@@ -37,10 +38,12 @@
   <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
   <script>
 
+  // fix image flicker
   // read path and get base64
   // save base64, lat, lng instead of points var
 
 let containerPoints = {};
+const imageCache = {};
 let startX = 0;
 let startY = 0;
 let isDragging = false;
@@ -59,32 +62,34 @@ var mapOptions = {
   maxZoom: 15   
 };
 
-async function fetchData() {
-    try {
-        const response = await fetch('imageData.json');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const points = await response.json();
-
-        const pointsData = points.map((point, index) => ({
-            id: `point_${index}`,
-            lat: point.lat,
-            lng: point.lng,
-            img: point.img
-        }));
-
-        return pointsData;
-    } catch (error) {
-        console.error('Error loading points:', error);
+const pointsData = [
+    {
+    "img": "test.png",
+    "lat": 22,
+    "lng": 19.5
+    },
+    {
+    "img": "test.png",
+    "lat": 22,
+    "lng": 77.5
     }
+];
+
+function preloadImages() {
+    const preloadPromises = pointsData.map((point) => {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.src = point.img; 
+            imageCache[point.img] = img;
+            img.onload = resolve;
+        });
+    });
+
+    return Promise.all(preloadPromises);
 }
 
-async function main() {
+function main() {
    
-    const pointsData = await fetchData();
-
     const map = L.map('map', mapOptions);
 
     L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}').addTo(map);
@@ -94,15 +99,19 @@ async function main() {
 
     function drawPoints() {
         if (!ctx) return;
-        
-        ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-        
-        for (const [name, point] of Object.entries(containerPoints)) {
-            ctx.beginPath();
-            ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
-            ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-            ctx.fill();
-        }
+
+        requestAnimationFrame(() => {
+            ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+            for (const [name, point] of Object.entries(containerPoints)) {
+                const img = imageCache["test.png"];
+                if (img && img.complete) {
+                    const imgWidth = 200;
+                    const imgHeight = 200;
+                    ctx.drawImage(img, point.x - imgWidth / 2, point.y - imgHeight / 2, imgWidth, imgHeight);
+                }
+            }
+        });
     }
 
     map.on('resize', function() {
@@ -115,15 +124,15 @@ async function main() {
         drawPoints();
     });
 
+    map.whenReady(async function() {
 
-    map.whenReady(function() {
-    
+        await preloadImages();
+
         map.fire('resize');
-
         for (const [name, point] of Object.entries(containerPoints)) {
             pointsData[name] = map.containerPointToLatLng([point.x, point.y]);
         }
-        
+    
         drawPoints();
     });
 
