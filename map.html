@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maharashtra Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@latest/dist/leaflet.css" />
-  <link rel="stylesheet" href="C:\Users\OJAS\Desktop\OLABHackathon\PFI\map.css" />
+  <link rel="stylesheet" href="map.css" />
 </head>
 <body>
     <div class="simulationCon">
@@ -37,19 +37,15 @@
   <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
   <script>
 
-  // add reading of json
   // read path and get base64
   // save base64, lat, lng instead of points var
 
-const pointsData = {
-    'Mumbai': L.latLng(19.0760, 72.8777),
-    'Pune': L.latLng(18.5204, 73.8567),
-    'Nagpur': L.latLng(21.1458, 79.0882),
-    'Nashik': L.latLng(20.0059, 73.7907),
-    'NewCity': L.latLng(20.1234, 73.4567)  
-};
-
 let containerPoints = {};
+let startX = 0;
+let startY = 0;
+let isDragging = false;
+let clientX = 0;
+let clientY = 0;
 
 var mapOptions = {
   center: [19.0760, 72.8777], 
@@ -63,112 +59,136 @@ var mapOptions = {
   maxZoom: 15   
 };
 
-const map = L.map('map', mapOptions);
+async function fetchData() {
+    try {
+        const response = await fetch('imageData.json');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const points = await response.json();
 
-L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}').addTo(map);
+        const pointsData = points.map((point, index) => ({
+            id: `point_${index}`,
+            lat: point.lat,
+            lng: point.lng,
+            img: point.img
+        }));
 
-let startX = 0;
-let startY = 0;
-let isDragging = false;
-let clientX = 0;
-let clientY = 0;
-
-const overlayCanvas = document.getElementById('overlayCanvas');
-const ctx = overlayCanvas.getContext('2d');
-
-function drawPoints() {
-    if (!ctx) return;
-    
-    ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-    
-    for (const [name, point] of Object.entries(containerPoints)) {
-        ctx.beginPath();
-        ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-        ctx.fill();
+        return pointsData;
+    } catch (error) {
+        console.error('Error loading points:', error);
     }
 }
 
-map.on('resize', function() {
-    const size = map.getSize();
-    overlayCanvas.width = size.x;
-    overlayCanvas.height = size.y;
-    for (const [name, latLng] of Object.entries(pointsData)) {
-        containerPoints[name] = map.latLngToContainerPoint(latLng);
+async function main() {
+   
+    const pointsData = await fetchData();
+
+    const map = L.map('map', mapOptions);
+
+    L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}').addTo(map);
+
+    const overlayCanvas = document.getElementById('overlayCanvas');
+    const ctx = overlayCanvas.getContext('2d');
+
+    function drawPoints() {
+        if (!ctx) return;
+        
+        ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        
+        for (const [name, point] of Object.entries(containerPoints)) {
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+            ctx.fill();
+        }
     }
-    drawPoints();
-});
+
+    map.on('resize', function() {
+        const size = map.getSize();
+        overlayCanvas.width = size.x;
+        overlayCanvas.height = size.y;
+        for (const [name, latLng] of Object.entries(pointsData)) {
+            containerPoints[name] = map.latLngToContainerPoint(latLng);
+        }
+        drawPoints();
+    });
 
 
-map.whenReady(function() {
-  
-    map.fire('resize');
-
-    for (const [name, point] of Object.entries(containerPoints)) {
-        pointsData[name] = map.containerPointToLatLng([point.x, point.y]);
-    }
+    map.whenReady(function() {
     
-    drawPoints();
-});
+        map.fire('resize');
+
+        for (const [name, point] of Object.entries(containerPoints)) {
+            pointsData[name] = map.containerPointToLatLng([point.x, point.y]);
+        }
+        
+        drawPoints();
+    });
 
 
-function handleEvent(eventName, e) {
-    try {
-        if (e && (e.originalEvent?.type || e.type)) {
-            const clientX = e.originalEvent?.clientX || e.clientX || e.changedTouches?.[0]?.clientX;
-            const clientY = e.originalEvent?.clientY || e.clientY || e.changedTouches?.[0]?.clientY;
+    function handleEvent(eventName, e) {
+        try {
+            if (e && (e.originalEvent?.type || e.type)) {
+                const clientX = e.originalEvent?.clientX || e.clientX || e.changedTouches?.[0]?.clientX;
+                const clientY = e.originalEvent?.clientY || e.clientY || e.changedTouches?.[0]?.clientY;
 
-            if (clientX !== undefined && clientY !== undefined) {
-                if (eventName === 'movestart' || eventName === 'pointerdown') {
-                    startX = clientX;
-                    startY = clientY;
-                    isDragging = true;
-                } else if ((eventName === 'drag' || eventName === 'touchmove') && isDragging) {
-                    const dragDeltaX = clientX - startX;
-                    const dragDeltaY = clientY - startY;
-                    
-                    for (const [name, point] of Object.entries(containerPoints)) {
-                        containerPoints[name].x += dragDeltaX;
-                        containerPoints[name].y += dragDeltaY;
+                if (clientX !== undefined && clientY !== undefined) {
+                    if (eventName === 'movestart' || eventName === 'pointerdown') {
+                        startX = clientX;
+                        startY = clientY;
+                        isDragging = true;
+                    } else if ((eventName === 'drag' || eventName === 'touchmove') && isDragging) {
+                        const dragDeltaX = clientX - startX;
+                        const dragDeltaY = clientY - startY;
+                        
+                        for (const [name, point] of Object.entries(containerPoints)) {
+                            containerPoints[name].x += dragDeltaX;
+                            containerPoints[name].y += dragDeltaY;
+                        }
+
+                        startX = clientX;
+                        startY = clientY;
+                    } else if (eventName === 'pointerup' || eventName === 'touchend') {
+                        isDragging = false;
                     }
 
-                    startX = clientX;
-                    startY = clientY;
-                } else if (eventName === 'pointerup' || eventName === 'touchend') {
-                    isDragging = false;
+                    drawPoints();
                 }
-
-                drawPoints();
             }
+        } catch (error) {
+            console.error('Logging error:', error);
         }
-    } catch (error) {
-        console.error('Logging error:', error);
     }
+
+    overlayCanvas.addEventListener('pointerdown', function(e) { handleEvent('pointerdown', e); map.dragging.enable(); });
+    overlayCanvas.addEventListener('pointerup', function(e) { handleEvent('pointerup', e); map.dragging.disable(); });
+    overlayCanvas.addEventListener('touchmove', function(e) { if (e.touches.length === 1) { handleEvent('touchmove', e); } });
+    overlayCanvas.addEventListener('mouseleave', function () { map.dragging.disable(); });
+    overlayCanvas.addEventListener('mousedown', function(e) { handleEvent('movestart', e); map.dragging.enable(); });
+    overlayCanvas.addEventListener('mouseup', function(e) { handleEvent('moveend', e); map.dragging.disable(); });
+
+    map.on('drag', function(e) { handleEvent('drag', e); });
+
+    map.on('zoomstart', function(e) {
+        for (const [name, point] of Object.entries(containerPoints)) {
+            pointsData[name] = map.containerPointToLatLng([point.x, point.y]);
+        }
+    });
+
+    map.on('zoomend', function(e) {
+        for (const [name, latLng] of Object.entries(pointsData)) {
+            containerPoints[name] = map.latLngToContainerPoint(latLng);
+        }
+        drawPoints();
+    });
+
+    map.dragging.disable();
+
 }
 
-overlayCanvas.addEventListener('pointerdown', function(e) { handleEvent('pointerdown', e); map.dragging.enable(); });
-overlayCanvas.addEventListener('pointerup', function(e) { handleEvent('pointerup', e); map.dragging.disable(); });
-overlayCanvas.addEventListener('touchmove', function(e) { if (e.touches.length === 1) { handleEvent('touchmove', e); } });
-overlayCanvas.addEventListener('mouseleave', function () { map.dragging.disable(); });
-overlayCanvas.addEventListener('mousedown', function(e) { handleEvent('movestart', e); map.dragging.enable(); });
-overlayCanvas.addEventListener('mouseup', function(e) { handleEvent('moveend', e); map.dragging.disable(); });
-
-map.on('drag', function(e) { handleEvent('drag', e); });
-
-map.on('zoomstart', function(e) {
-    for (const [name, point] of Object.entries(containerPoints)) {
-        pointsData[name] = map.containerPointToLatLng([point.x, point.y]);
-    }
-});
-
-map.on('zoomend', function(e) {
-    for (const [name, latLng] of Object.entries(pointsData)) {
-        containerPoints[name] = map.latLngToContainerPoint(latLng);
-    }
-    drawPoints();
-});
-
-map.dragging.disable();
+document.addEventListener('DOMContentLoaded', main);
 
   </script>
 </body>
