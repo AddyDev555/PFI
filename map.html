@@ -9,31 +9,8 @@
   <!--<link rel="stylesheet" href="map.css" />-->
 </head>
 <body>
-    <div class="simulationCon">
-        <div class="instructionCon">
-            <h1>Instructions</h1>
-            <div class="himalayas_drawCon">
-                <h2>Topic 1: Himalayan Ranges</h2>
-                <p>Paint the Himalayan Mountain Ranges, Select paint and hover the mouse on the appropriate regions.</p>
-                <div class="paintsCon">
-                    <h2>Colors</h2>
-                    <div class="paints">
-                        <div class="greenColor"></div>
-                        <span>Green</span>
-                    </div>
-                    <div class="paints">
-                        <div class="brownColor"></div>
-                        <span>Brown</span>
-                    </div>
-                </div>
-            </div>
-            Instructions go here!
-        </div>
-        <div class="mainCon">
-            <div id="map" data-tap-disabled="true">
-                <canvas id="overlayCanvas"></canvas>
-            </div>
-        </div>
+    <div id="map" data-tap-disabled="true">
+        <canvas id="overlayCanvas"></canvas>
     </div>
   <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
   <script>
@@ -100,14 +77,24 @@ function main() {
     function drawPoints() {
         if (!ctx) return;
 
+        const opacity = 0.2; 
+        ctx.globalAlpha = opacity;
+
         requestAnimationFrame(() => {
             ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+            const zoomLevel = map.getZoom();
+            const scaleFactor = Math.pow(2, zoomLevel - mapOptions.minZoom); 
 
             for (const [name, point] of Object.entries(containerPoints)) {
                 const img = imageCache["test.png"];
                 if (img && img.complete) {
-                    const imgWidth = 200;
-                    const imgHeight = 200;
+
+                    const baseWidth = 50; 
+                    const baseHeight = 50;
+                    const imgWidth = baseWidth * scaleFactor;
+                    const imgHeight = baseHeight * scaleFactor;
+
                     ctx.drawImage(img, point.x - imgWidth / 2, point.y - imgHeight / 2, imgWidth, imgHeight);
                 }
             }

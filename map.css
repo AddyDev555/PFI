@@ -1,8 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap');
 
-html, body { height: 100%; margin: 0; font-family: "Roboto Slab", serif;}
+html, body { 
+    height: 100%; 
+    margin: 0; 
+    font-family: "Roboto Slab", serif;
+}
 
-#map { height: 100%; width: 100%; position: relative; touch-action: none; }
+#map { 
+    height: 100%; 
+    width: 100%; 
+    position: relative; 
+    touch-action: none;
+ }
 
 #overlayCanvas { 
   position: absolute; 
@@ -13,101 +22,3 @@ html, body { height: 100%; margin: 0; font-family: "Roboto Slab", serif;}
   z-index: 401; 
 }
 
-.simulationCon {
-    width: 80%;
-    height: 85vh;
-    margin: auto;
-    margin-top: 3.55%;
-    background-color: lightblue;
-    display: flex;
-    justify-content: center; 
-    align-items: center; 
-    position: relative; 
-    padding: 2px; 
-    border-radius: 5px;
-    overflow: hidden; 
-}
-
-.mainCon {
-    width: 100%; 
-    height: 100%;
-}
-
-.instructionCon {
-    position: absolute; 
-    top: 10px; 
-    left: 10px; 
-    width: 20%; 
-    height: auto; 
-    background-color: white;
-    padding: 10px;
-    border: 1px solid #ccc; 
-    border-radius: 5px; 
-    z-index: 402;
-    overflow-y: auto;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
-}
-
-.instructionCon h1{
-    font-size: 1.2rem;
-    color: black;
-    width: 58%;
-    margin: auto;
-    margin-top: 10px;
-}
-
-.himalayas_drawCon{
-    margin-top: 20px;
-    padding-left: 7px;
-    padding-right: 7px;
-}
-
-.himalayas_drawCon h2{
-    font-size: 0.9rem;
-    font-weight: 500;
-    margin-bottom: 0;
-}
-
-.himalayas_drawCon p{
-    text-align: justify;
-    font-size: 0.8rem;
-    margin-top: 3px;
-}
-
-.paintsCon h2{
-    margin-bottom: 7px;
-}
-
-.paints{
-    display: flex;
-    align-items: center;
-    align-content: center;
-    cursor: pointer;
-    width: 33%;
-    padding: 5px 5px;
-    margin-top: 5px;
-    border-radius: 5px;
-}
-
-.paints:hover{
-    background-color: whitesmoke;
-}
-
-.greenColor{
-    width: 15px;
-    height: 15px;
-    border-radius: 2px;
-    background-color: green;
-}
-
-.brownColor{
-    width: 15px;
-    height: 15px;
-    border-radius: 2px;
-    background-color: brown;
-}
-
-.paints span{
-    font-size: 0.9rem;
-    margin-left: 5px;
-}
