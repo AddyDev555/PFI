@@ -6,7 +6,6 @@
   <title>Maharashtra Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@latest/dist/leaflet.css" />
   <link rel="stylesheet" href="C:\Users\OJAS\Desktop\OLABHackathon\PFI\map.css" />
-  <!--<link rel="stylesheet" href="map.css" />-->
 </head>
 <body>
     <div id="map" data-tap-disabled="true">
@@ -14,10 +13,6 @@
     </div>
   <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
   <script>
-
-  // fix image flicker
-  // read path and get base64
-  // save base64, lat, lng instead of points var
 
 let containerPoints = {};
 const imageCache = {};
@@ -41,14 +36,9 @@ var mapOptions = {
 
 const pointsData = [
     {
-    "img": "test.png",
-    "lat": 22,
-    "lng": 19.5
-    },
-    {
-    "img": "test.png",
-    "lat": 22,
-    "lng": 77.5
+    "img": "himalaya.jpg",
+    "lat": 30.85,
+    "lng": 81.90
     }
 ];
 
@@ -77,7 +67,7 @@ function main() {
     function drawPoints() {
         if (!ctx) return;
 
-        const opacity = 0.2; 
+        const opacity = 0.05; 
         ctx.globalAlpha = opacity;
 
         requestAnimationFrame(() => {
@@ -87,11 +77,11 @@ function main() {
             const scaleFactor = Math.pow(2, zoomLevel - mapOptions.minZoom); 
 
             for (const [name, point] of Object.entries(containerPoints)) {
-                const img = imageCache["test.png"];
+                const img = imageCache[name];
                 if (img && img.complete) {
 
-                    const baseWidth = 50; 
-                    const baseHeight = 50;
+                    const baseWidth = 328;
+                    const baseHeight = 205;
                     const imgWidth = baseWidth * scaleFactor;
                     const imgHeight = baseHeight * scaleFactor;
 
@@ -106,7 +96,7 @@ function main() {
         overlayCanvas.width = size.x;
         overlayCanvas.height = size.y;
         for (const [name, latLng] of Object.entries(pointsData)) {
-            containerPoints[name] = map.latLngToContainerPoint(latLng);
+            containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
         }
         drawPoints();
     });
@@ -116,11 +106,15 @@ function main() {
         await preloadImages();
 
         map.fire('resize');
-        for (const [name, point] of Object.entries(containerPoints)) {
-            pointsData[name] = map.containerPointToLatLng([point.x, point.y]);
+        for (const [name, latLng] of Object.entries(pointsData)) {
+            containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
         }
     
         drawPoints();
+
+        setInterval(() => {
+            map.fire('resize');
+        }, 2000);
     });
 
 
@@ -167,15 +161,9 @@ function main() {
 
     map.on('drag', function(e) { handleEvent('drag', e); });
 
-    map.on('zoomstart', function(e) {
-        for (const [name, point] of Object.entries(containerPoints)) {
-            pointsData[name] = map.containerPointToLatLng([point.x, point.y]);
-        }
-    });
-
     map.on('zoomend', function(e) {
         for (const [name, latLng] of Object.entries(pointsData)) {
-            containerPoints[name] = map.latLngToContainerPoint(latLng);
+            containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
         }
         drawPoints();
     });
