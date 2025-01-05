@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Maharashtra Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@latest/dist/leaflet.css" />
-  <link rel="stylesheet" href="C:\Users\OJAS\Desktop\OLABHackathon\PFI\map.css" />
+  <link rel="stylesheet" href="/asset/map.css" />
 </head>
 <body>
     <div id="map" data-tap-disabled="true">
@@ -37,8 +37,8 @@ var mapOptions = {
 const pointsData = [
     {
     "img": "himalaya.jpg",
-    "lat": 30.85,
-    "lng": 81.90
+    "lat": 31.5,
+    "lng": 82.2
     }
 ];
 
@@ -80,8 +80,8 @@ function main() {
                 const img = imageCache[name];
                 if (img && img.complete) {
 
-                    const baseWidth = 328;
-                    const baseHeight = 205;
+                    const baseWidth = 361;
+                    const baseHeight = 226;
                     const imgWidth = baseWidth * scaleFactor;
                     const imgHeight = baseHeight * scaleFactor;
 
