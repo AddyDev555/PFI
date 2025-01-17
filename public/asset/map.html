@@ -11,6 +11,18 @@
     <div id="map" data-tap-disabled="true">
         <canvas id="overlayCanvas"></canvas>
     </div>
+    <div class="opacitySlider">
+        <input
+            id="opacityRange"
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value="1"
+            oninput="updateOpacity(this.value)"
+        />
+        <p id="opacityValue">Opacity: 1</p>
+    </div>
   <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
   <script>
 
@@ -21,6 +33,7 @@ let startY = 0;
 let isDragging = false;
 let clientX = 0;
 let clientY = 0;
+let opacityValue = 1;
 
 var mapOptions = {
   center: [19.0760, 72.8777], 
@@ -67,13 +80,12 @@ function main() {
 
     function drawPoints() {
         if (!ctx) return;
+        ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-        const opacity = 0.7; 
-        ctx.globalAlpha = opacity;
+        ctx.globalAlpha = opacityValue;
 
         requestAnimationFrame(() => {
             ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-
             const zoomLevel = map.getZoom();
             const scaleFactor = Math.pow(2, zoomLevel - mapOptions.minZoom); 
 
@@ -174,7 +186,11 @@ function main() {
 }
 
 document.addEventListener('DOMContentLoaded', main);
-
+function updateOpacity(value) {
+    opacityValue = parseFloat(value);
+    document.getElementById('opacityValue').textContent = `Opacity: ${value}`;
+    drawPoints();
+  }
   </script>
 </body>
 </html>

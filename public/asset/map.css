@@ -22,3 +22,35 @@ html, body {
   z-index: 401; 
 }
 
+
+.opacitySlider{
+  position: absolute;
+  top: 20px;
+  right: 0px;
+  z-index: 1000;
+}
+
+.opacitySlider input{
+  width: 60%;
+  height: 0.7vh;
+  appearance: none;
+  background: black;
+  border-radius: 10px;
+  cursor: grab;
+}
+
+.opacitySlider input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: background 0.3s ease; 
+}
+
+.opacitySlider p{
+  position: relative;
+  right: 0;
+}

@@ -4,6 +4,8 @@ import Main from './Main';
 
 export default function Home() {
     const [color, setColor] = useState("");
+    const [sliderValue, setSliderValue] = useState(1);
+
 
     function handleColorClick(paintColor) {
         setColor(paintColor);
@@ -14,7 +16,7 @@ export default function Home() {
     function submitAns() {
         let himalayas_drawCon = document.querySelector(".himalayas_drawCon");
         let himalayas_drawCon_Result = document.querySelector(".himalayas_drawCon_Result");
-    
+
         if (himalayas_drawCon_Result.style.display === "" || himalayas_drawCon_Result.style.display === "none") {
             himalayas_drawCon_Result.style.display = "block";
             himalayas_drawCon.style.display = "none";
@@ -22,7 +24,11 @@ export default function Home() {
             himalayas_drawCon_Result.style.display = "none";
         }
     }
-    
+
+    const handleSliderChange = (event) => {
+        setSliderValue(event.target.value);
+    };
+
 
 
     return (
@@ -38,15 +44,15 @@ export default function Home() {
 
                         <div className="paintsCon">
                             <h2>Colors</h2>
-                            <div 
-                                className="paints" 
+                            <div
+                                className="paints"
                                 onClick={() => handleColorClick("green")}
                             >
                                 <div className="greenColor"></div>
                                 <span>Green</span>
                             </div>
-                            <div 
-                                className="paints" 
+                            <div
+                                className="paints"
                                 onClick={() => handleColorClick("brown")}
                             >
                                 <div className="brownColor"></div>
@@ -67,7 +73,7 @@ export default function Home() {
                 </div>
 
                 <div className="mainCon">
-                    <Main />
+                    <Main opacity={sliderValue} />
                 </div>
             </div>
         </main>
