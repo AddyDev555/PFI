@@ -4,8 +4,6 @@ import Main from './Main';
 
 export default function Home() {
     const [color, setColor] = useState("");
-    const [sliderValue, setSliderValue] = useState(1);
-
 
     function handleColorClick(paintColor) {
         setColor(paintColor);
@@ -24,10 +22,6 @@ export default function Home() {
             himalayas_drawCon_Result.style.display = "none";
         }
     }
-
-    const handleSliderChange = (event) => {
-        setSliderValue(event.target.value);
-    };
 
 
 
@@ -73,7 +67,7 @@ export default function Home() {
                 </div>
 
                 <div className="mainCon">
-                    <Main opacity={sliderValue} />
+                    <Main />
                 </div>
             </div>
         </main>
