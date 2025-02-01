@@ -12,13 +12,16 @@
 <body>
     <div id="map" data-tap-disabled="true">
         <canvas id="overlayCanvas"></canvas>
+        <canvas id="drawCanvas"></canvas>
     </div>
     <div class="opacitySlider">
         <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1"
             oninput="window.updateOpacity(this.value)" />
-        <p id="opacityValue">Opacity: 1</p>
     </div>
     <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile Provider</button>
+    <button id="toggleDraw" style="position: absolute; bottom: 50px; right: 10px; z-index: 1000;">Enable Drawing</button>
+    <button id="compareDraw" style="position: absolute; bottom: 90px; right: 10px; z-index: 1000;">Compare Area</button>
+
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script>
 
@@ -30,6 +33,10 @@
         let clientX = 0;
         let clientY = 0;
         let opacityValue = 1;
+
+        let drawingEnabled = false;
+        let isDrawing = false;
+
 
         const tileProviders = [
             'http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
@@ -93,6 +100,9 @@
             const overlayCanvas = document.getElementById('overlayCanvas');
             const ctx = overlayCanvas.getContext('2d');
 
+            const drawCanvas = document.getElementById('drawCanvas');
+            const drawCtx = drawCanvas.getContext('2d');
+
             function drawPoints() {
                 if (!ctx) return;
                 ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
@@ -123,6 +133,8 @@
                 const size = map.getSize();
                 overlayCanvas.width = size.x;
                 overlayCanvas.height = size.y;
+                drawCanvas.width = size.x;
+                drawCanvas.height = size.y;
                 for (const [name, latLng] of Object.entries(pointsData)) {
                     containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
                 }
@@ -200,7 +212,6 @@
 
             function updateOpacity(value) {
                 opacityValue = parseFloat(value);
-                document.getElementById('opacityValue').textContent = `Opacity: ${value}`;
                 drawPoints();
             }
             window.updateOpacity = updateOpacity;
@@ -209,6 +220,57 @@
                 currentTileProvider = (currentTileProvider + 1) % tileProviders.length;
                 map.removeLayer(tileLayer);
                 tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
+            });
+
+            document.getElementById('toggleDraw').addEventListener('click', function () {
+                drawingEnabled = !drawingEnabled;
+
+                if (drawingEnabled) {
+                    map.dragging.disable();
+                    drawCanvas.style.zIndex = '402';
+                } else {
+                    map.dragging.enable();
+                    drawCanvas.style.zIndex = '-100';
+                }
+
+                this.innerText = drawingEnabled ? "Disable Drawing" : "Enable Drawing";
+            });
+
+            drawCanvas.addEventListener('mousedown', function (e) {
+                if (!drawingEnabled) return;
+                isDrawing = true;
+                drawCtx.beginPath();
+                drawCtx.moveTo(e.offsetX, e.offsetY);
+            });
+
+            drawCanvas.addEventListener('mousemove', function (e) {
+                if (isDrawing) {
+                    drawCtx.lineTo(e.offsetX, e.offsetY);
+                    drawCtx.strokeStyle = 'red';
+                    drawCtx.lineWidth = 3;
+                    drawCtx.stroke();
+                }
+            });
+
+            drawCanvas.addEventListener('mouseup', function () {
+                isDrawing = false;
+            });
+
+            document.getElementById('compareDraw').addEventListener('click', function () {
+                const drawData = drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
+                const overlayData = ctx.getImageData(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+                let drawPixels = 0, overlayPixels = 0;
+
+                for (let i = 0; i < drawData.data.length; i += 4) {
+                    const isDrawn = drawData.data[i + 3] > 0;
+                    const isOverlay = overlayData.data[i + 3] > 0;
+                    if (isDrawn) drawPixels++;
+                    if (isOverlay) overlayPixels++;
+                }
+
+                const ratio = overlayPixels ? (drawPixels / overlayPixels).toFixed(2) : 0;
+                alert(`Drawn Area / Image Area Ratio: ${ratio}`);
             });
 
         }
