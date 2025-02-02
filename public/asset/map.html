@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,15 +7,14 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@latest/dist/leaflet.css" />
     <link rel="stylesheet" href="/asset/map.css" />
 </head>
-
 <body>
     <div id="map" data-tap-disabled="true">
         <canvas id="overlayCanvas"></canvas>
         <canvas id="drawCanvas"></canvas>
     </div>
     <div class="opacitySlider">
-        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1"
-            oninput="window.updateOpacity(this.value)" />
+        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="0" oninput="window.updateOpacity(this.value)" />
+        <p id="opacityValue">Scroll for Hint's: 0</p>
     </div>
     <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile Provider</button>
     <button id="toggleDraw" style="position: absolute; bottom: 50px; right: 10px; z-index: 1000;">Enable Drawing</button>
@@ -24,7 +22,6 @@
 
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script>
-
         let containerPoints = {};
         const imageCache = {};
         let startX = 0;
@@ -94,7 +91,6 @@
         }
 
         function main() {
-
             const map = L.map('map', mapOptions);
 
             let tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
@@ -119,12 +115,10 @@
                     for (const [name, point] of Object.entries(containerPoints)) {
                         const img = imageCache[name];
                         if (img && img.complete) {
-
                             const baseWidth = 376.80;
                             const baseHeight = 391.20;
                             const imgWidth = baseWidth * scaleFactor;
                             const imgHeight = baseHeight * scaleFactor;
-
                             ctx.drawImage(img, point.x - imgWidth / 2, point.y - imgHeight / 2, imgWidth, imgHeight);
                         }
                     }
@@ -145,14 +139,11 @@
             });
 
             map.whenReady(async function () {
-
                 await preloadImages();
-
                 map.fire('resize');
                 for (const [name, latLng] of Object.entries(pointsData)) {
                     containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
                 }
-
                 drawPoints();
 
                 setInterval(() => {
@@ -188,7 +179,6 @@
                             }
 
                             drawPoints();
-                            redrawStrokes();
                         }
                     }
                 } catch (error) {
@@ -196,14 +186,19 @@
                 }
             }
 
-            overlayCanvas.addEventListener('pointerdown', function (e) { handleEvent('pointerdown', e); map.dragging.enable(); });
-            overlayCanvas.addEventListener('pointerup', function (e) { handleEvent('pointerup', e); map.dragging.disable(); });
-            overlayCanvas.addEventListener('touchmove', function (e) { if (e.touches.length === 1) { handleEvent('touchmove', e); } });
-            overlayCanvas.addEventListener('mouseleave', function () { map.dragging.disable(); });
-            overlayCanvas.addEventListener('mousedown', function (e) { handleEvent('movestart', e); map.dragging.enable(); });
-            overlayCanvas.addEventListener('mouseup', function (e) { handleEvent('moveend', e); map.dragging.disable(); });
+            overlayCanvas.addEventListener('mousedown', startPaint);
+            overlayCanvas.addEventListener('mouseup', stopPaint);
+            overlayCanvas.addEventListener('mousemove', drawPaint);
 
-            map.on('drag', function (e) { handleEvent('drag', e); });
+            overlayCanvas.addEventListener('touchstart', startPaint);
+            overlayCanvas.addEventListener('touchend', stopPaint);
+            overlayCanvas.addEventListener('touchmove', drawPaint);
+
+            overlayCanvas.addEventListener('mouseleave', stopPaint);
+
+            map.on('drag', function (e) {
+                drawPoints();
+            });
 
             map.on('zoomend', function (e) {
                 for (const [name, latLng] of Object.entries(pointsData)) {
@@ -366,8 +361,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', main);
-
     </script>
 </body>
-
 </html>
