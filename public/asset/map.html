@@ -15,6 +15,7 @@
         <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="0" oninput="window.updateOpacity(this.value)" />
         <p id="opacityValue">Scroll for Hint's: 0</p>
     </div>
+    <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile Provider</button>
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script>
         let containerPoints = {};
@@ -24,12 +25,16 @@
         let isDragging = false;
         let clientX = 0;
         let clientY = 0;
-        let opacityValue = 0;
-        let painting = false;
-        let lastX = 0;
-        let lastY = 0;
-        const paintColor = 'blue';
-        const paintWidth = 5;
+        let opacityValue = 1;
+
+        const tileProviders = [
+            'http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+            'http://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}',
+            'http://services.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
+            'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        ];
+        let currentTileProvider = 0;
 
         var mapOptions = {
             center: [19.0760, 72.8777],
@@ -78,7 +83,7 @@
         function main() {
             const map = L.map('map', mapOptions);
 
-            L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}').addTo(map);
+            let tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
 
             const overlayCanvas = document.getElementById('overlayCanvas');
             const ctx = overlayCanvas.getContext('2d');
@@ -186,8 +191,14 @@
                 document.getElementById('opacityValue').textContent = `Opacity: ${value}`;
                 drawPoints();
             }
-
             window.updateOpacity = updateOpacity;
+                        
+            document.getElementById('changeTileProvider').addEventListener('click', function () {
+                currentTileProvider = (currentTileProvider + 1) % tileProviders.length;
+                map.removeLayer(tileLayer);
+                tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
+            });
+
         }
 
         document.addEventListener('DOMContentLoaded', main);
