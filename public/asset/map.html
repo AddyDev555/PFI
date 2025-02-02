@@ -36,6 +36,8 @@
 
         let drawingEnabled = false;
         let isDrawing = false;
+        let geoStrokes = []; // Will store strokes with their geographical coordinates
+        let currentGeoStroke = null;
 
 
         const tileProviders = [
@@ -139,6 +141,7 @@
                     containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
                 }
                 drawPoints();
+                redrawStrokes();
             });
 
             map.whenReady(async function () {
@@ -185,6 +188,7 @@
                             }
 
                             drawPoints();
+                            redrawStrokes();
                         }
                     }
                 } catch (error) {
@@ -206,6 +210,7 @@
                     containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
                 }
                 drawPoints();
+                redrawStrokes();
             });
 
             map.dragging.disable();
@@ -233,18 +238,32 @@
                     drawCanvas.style.zIndex = '-100';
                 }
 
+                redrawStrokes();
+
                 this.innerText = drawingEnabled ? "Disable Drawing" : "Enable Drawing";
             });
 
             drawCanvas.addEventListener('mousedown', function (e) {
                 if (!drawingEnabled) return;
                 isDrawing = true;
+                const geoPoint = screenToGeo(e.offsetX, e.offsetY, map);
+                currentGeoStroke = {
+                    points: [{
+                        screen: { x: e.offsetX, y: e.offsetY },
+                        geo: { lat: geoPoint.lat, lng: geoPoint.lng }
+                    }]
+                };
                 drawCtx.beginPath();
                 drawCtx.moveTo(e.offsetX, e.offsetY);
             });
 
             drawCanvas.addEventListener('mousemove', function (e) {
                 if (isDrawing) {
+                    const geoPoint = screenToGeo(e.offsetX, e.offsetY, map);
+                    currentGeoStroke.points.push({
+                        screen: { x: e.offsetX, y: e.offsetY },
+                        geo: { lat: geoPoint.lat, lng: geoPoint.lng }
+                    });
                     drawCtx.lineTo(e.offsetX, e.offsetY);
                     drawCtx.strokeStyle = 'red';
                     drawCtx.lineWidth = 3;
@@ -253,10 +272,16 @@
             });
 
             drawCanvas.addEventListener('mouseup', function () {
-                isDrawing = false;
+                if (isDrawing) {
+                    geoStrokes.push(currentGeoStroke);
+                    currentGeoStroke = null;
+                    isDrawing = false;
+                }
             });
 
             document.getElementById('compareDraw').addEventListener('click', function () {
+                redrawStrokes();
+
                 const drawData = drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
                 const overlayData = ctx.getImageData(0, 0, overlayCanvas.width, overlayCanvas.height);
 
@@ -272,6 +297,71 @@
                 const ratio = overlayPixels ? (drawPixels / overlayPixels).toFixed(2) : 0;
                 alert(`Drawn Area / Image Area Ratio: ${ratio}`);
             });
+
+            function screenToGeo(x, y, map) {
+                const point = L.point(x, y);
+                const latLng = map.containerPointToLatLng(point);
+                return latLng;
+            }
+
+            function geoToScreen(lat, lng, map) {
+                const latLng = L.latLng(lat, lng);
+                const point = map.latLngToContainerPoint(latLng);
+                return point;
+            }
+
+            function redrawStrokes() {
+                drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+                
+                geoStrokes.forEach(stroke => {
+                    if (stroke.points.length > 0) {
+                        drawCtx.beginPath();
+                        
+                        const firstPoint = geoToScreen(
+                            stroke.points[0].geo.lat,
+                            stroke.points[0].geo.lng,
+                            map
+                        );
+                        drawCtx.moveTo(firstPoint.x, firstPoint.y);
+                        
+                        for (let i = 1; i < stroke.points.length; i++) {
+                            const screenPoint = geoToScreen(
+                                stroke.points[i].geo.lat,
+                                stroke.points[i].geo.lng,
+                                map
+                            );
+                            drawCtx.lineTo(screenPoint.x, screenPoint.y);
+                        }
+                        
+                        drawCtx.strokeStyle = 'red';
+                        drawCtx.lineWidth = 3;
+                        drawCtx.stroke();
+                    }
+                });
+
+                if (currentGeoStroke && currentGeoStroke.points.length > 0) {
+                    drawCtx.beginPath();
+                    const firstPoint = geoToScreen(
+                        currentGeoStroke.points[0].geo.lat,
+                        currentGeoStroke.points[0].geo.lng,
+                        map
+                    );
+                    drawCtx.moveTo(firstPoint.x, firstPoint.y);
+                    
+                    for (let i = 1; i < currentGeoStroke.points.length; i++) {
+                        const screenPoint = geoToScreen(
+                            currentGeoStroke.points[i].geo.lat,
+                            currentGeoStroke.points[i].geo.lng,
+                            map
+                        );
+                        drawCtx.lineTo(screenPoint.x, screenPoint.y);
+                    }
+                    
+                    drawCtx.strokeStyle = 'red';
+                    drawCtx.lineWidth = 3;
+                    drawCtx.stroke();
+                }
+            }
 
         }
 
