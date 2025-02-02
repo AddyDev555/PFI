@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Head section remains the same -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maharashtra Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@latest/dist/leaflet.css" />
+    <link rel="stylesheet" href="/asset/map.css" />
+</head>
+
+<body>
+    <div id="map" data-tap-disabled="true">
+        <canvas id="overlayCanvas"></canvas>
+        <canvas id="drawCanvas"></canvas>
+    </div>
+    <div class="opacitySlider">
+        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="0" oninput="window.updateOpacity(this.value)" />
+        <p id="opacityValue">Scroll for Hint's</p>
+    </div>
+    <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile Provider</button>
+
+    <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
+    <script>
+        // Previous variable declarations remain the same
+        let containerPoints = {};
+        const imageCache = {};
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        let opacityValue = 0;
+
+        const fixedBoxes = [
+            { lat: 19.0760, lng: 72.8777, width: 60, height: 20, radius: 5 },
+            { lat: 18.5204, lng: 73.8567, width: 60, height: 20, radius: 5 },
+            { lat: 21.1458, lng: 79.0882, width: 60, height: 20, radius: 5 },
+            { lat: 20.0059, lng: 75.5762, width: 60, height: 20, radius: 5 }
+        ];
+
+        const tileProviders = [
+            'http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+            'http://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}',
+            'http://services.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
+            'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        ];
+        let currentTileProvider = 0;
+
+        var mapOptions = {
+            center: [19.0760, 72.8777],
+            zoom: 2,
+            zoomControl: false,
+            tap: false,
+            touchZoom: true,
+            scrollWheelZoom: true,
+            doubleClickZoom: false,
+            minZoom: 4,
+            maxZoom: 11,
+            attributionControl: false
+        };
+
+        const pointsData = [
+            {
+                "img": "mapHR.png",
+                "lat": 24.351399328153236,
+                "lng": 81.9337890625
+            },
+            {
+                "img": "mapHM.png",
+                "lat": 24.351399328153236,
+                "lng": 81.9337890625
+            },
+            {
+                "img": "mapRM.png",
+                "lat": 24.351399328153236,
+                "lng": 81.9337890625
+            }
+        ];
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        function preloadImages() {
+            const preloadPromises = pointsData.map((point) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = point.img;
+                    imageCache[point.img] = img;
+                    img.onload = resolve;
+                });
+            });
+            return Promise.all(preloadPromises);
+        }
+
+        function main() {
+            const map = L.map('map', mapOptions);
+            let tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
+
+            const overlayCanvas = document.getElementById('overlayCanvas');
+            const ctx = overlayCanvas.getContext('2d');
+
+            const drawCanvas = document.getElementById('drawCanvas');
+            const drawCtx = drawCanvas.getContext('2d');
+
+            drawCanvas.style.zIndex = '1000';
+
+            function drawPoints() {
+                if (!ctx) return;
+                ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                ctx.globalAlpha = opacityValue;
+
+                const zoomLevel = map.getZoom();
+                const scaleFactor = Math.pow(2, zoomLevel - mapOptions.minZoom);
+
+                for (const [name, point] of Object.entries(containerPoints)) {
+                    const img = imageCache[name];
+                    if (img && img.complete) {
+                        const baseWidth = 376.80;
+                        const baseHeight = 391.20;
+                        const imgWidth = baseWidth * scaleFactor;
+                        const imgHeight = baseHeight * scaleFactor;
+                        ctx.drawImage(img, point.x - imgWidth / 2, point.y - imgHeight / 2, imgWidth, imgHeight);
+                    }
+                }
+            }
+
+            function drawFixedBoxes() {
+                drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+                drawCtx.strokeStyle = 'black';
+                drawCtx.lineWidth = 2;
+
+                fixedBoxes.forEach(box => {
+                    const point = map.latLngToContainerPoint([box.lat, box.lng]);
+                    roundRect(
+                        drawCtx,
+                        point.x - box.width/2,
+                        point.y - box.height/2,
+                        box.width,
+                        box.height,
+                        box.radius
+                    );
+                });
+            }
+
+            function updateCanvases() {
+                drawPoints();
+                drawFixedBoxes();
+                requestAnimationFrame(updateCanvases);
+            }
+
+            // Rest of the code remains the same...
+            map.on('resize', function () {
+                const size = map.getSize();
+                overlayCanvas.width = size.x;
+                overlayCanvas.height = size.y;
+                drawCanvas.width = size.x;
+                drawCanvas.height = size.y;
+                for (const [name, latLng] of Object.entries(pointsData)) {
+                    containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
+                }
+            });
+
+            map.whenReady(async function () {
+                await preloadImages();
+                map.fire('resize');
+                for (const [name, latLng] of Object.entries(pointsData)) {
+                    containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
+                }
+                updateCanvases();
+            });
+
+            function handleEvent(eventName, e) {
+                try {
+                    if (e && (e.originalEvent?.type || e.type)) {
+                        const clientX = e.originalEvent?.clientX || e.clientX || e.changedTouches?.[0]?.clientX;
+                        const clientY = e.originalEvent?.clientY || e.clientY || e.changedTouches?.[0]?.clientY;
+
+                        if (clientX !== undefined && clientY !== undefined) {
+                            if (eventName === 'movestart' || eventName === 'pointerdown') {
+                                startX = clientX;
+                                startY = clientY;
+                                isDragging = true;
+                            } else if ((eventName === 'drag' || eventName === 'touchmove') && isDragging) {
+                                const dragDeltaX = clientX - startX;
+                                const dragDeltaY = clientY - startY;
+
+                                for (const [name, point] of Object.entries(containerPoints)) {
+                                    containerPoints[name].x += dragDeltaX;
+                                    containerPoints[name].y += dragDeltaY;
+                                }
+
+                                startX = clientX;
+                                startY = clientY;
+                            } else if (eventName === 'pointerup' || eventName === 'touchend') {
+                                isDragging = false;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Logging error:', error);
+                }
+            }
+
+            overlayCanvas.addEventListener('pointerdown', function(e) { handleEvent('pointerdown', e); map.dragging.enable(); });
+            overlayCanvas.addEventListener('pointerup', function(e) { handleEvent('pointerup', e); map.dragging.disable(); });
+            overlayCanvas.addEventListener('touchmove', function(e) { if (e.touches.length === 1) { handleEvent('touchmove', e); } });
+            overlayCanvas.addEventListener('mouseleave', function() { map.dragging.disable(); });
+            overlayCanvas.addEventListener('mousedown', function(e) { handleEvent('movestart', e); map.dragging.enable(); });
+            overlayCanvas.addEventListener('mouseup', function(e) { handleEvent('moveend', e); map.dragging.disable(); });
+
+            map.on('drag', function(e) { handleEvent('drag', e); });
+            map.on('zoomend', function() {
+                for (const [name, latLng] of Object.entries(pointsData)) {
+                    containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
+                }
+            });
+
+            map.dragging.disable();
+
+            function updateOpacity(value) {
+                opacityValue = parseFloat(value);
+            }
+            window.updateOpacity = updateOpacity;
+
+            document.getElementById('changeTileProvider').addEventListener('click', function() {
+                currentTileProvider = (currentTileProvider + 1) % tileProviders.length;
+                map.removeLayer(tileLayer);
+                tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', main);
+    </script>
+</body>
+</html>

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import "./css/Home.css";
 import Main from './Main';
+import DADmap from './DADmap';
 
 export default function Home() {
     const [color, setColor] = useState("");
+    const [DAD, setDAD] = useState("");
 
     function handleColorClick(paintColor) {
         setColor(paintColor);
@@ -12,21 +14,31 @@ export default function Home() {
     console.log("Selected Color:", color);
 
     function submitAns() {
-        let himalayas_drawCon = document.querySelector(".himalayas_drawCon");
-        let himalayas_drawCon_Result = document.querySelector(".himalayas_drawCon_Result");
-        let himalayasDragAndDropCon = document.querySelector(".himalayasDragAndDropCon");
-        let himalayasDADResult = document.querySelector(".himalayasDADResult"); 
-
-        if (himalayas_drawCon_Result.style.display === "" || himalayas_drawCon_Result.style.display === "none") {
-            himalayas_drawCon_Result.style.display = "block";
-            himalayas_drawCon.style.display = "none";
-        } else if (himalayas_drawCon_Result.style.display === "block") {
-            himalayas_drawCon_Result.style.display = "none";
-            himalayasDragAndDropCon.style.display = "block";
+        const containers = {
+            draw: document.querySelector(".himalayas_drawCon"),
+            drawResult: document.querySelector(".himalayas_drawCon_Result"),
+            dragAndDrop: document.querySelector(".himalayasDragAndDropCon"),
+            dadResult: document.querySelector(".himalayasDADResult")
+        };
+    
+        if (!Object.values(containers).every(container => container)) {
+            console.error("One or more containers not found");
+            return;
         }
-        else if(himalayasDragAndDropCon.style.display === "block"){
-            himalayasDragAndDropCon.style.display = "none";
-            himalayasDADResult.style.display = "block";
+    
+        if (containers.drawResult.style.display === "" || 
+            containers.drawResult.style.display === "none") {
+            containers.draw.style.display = "none";
+            containers.drawResult.style.display = "block";
+    
+        } else if (containers.drawResult.style.display === "block") {
+            containers.drawResult.style.display = "none";
+            containers.dragAndDrop.style.display = "block";
+            setDAD("DAD");
+    
+        } else if (containers.dragAndDrop.style.display === "block") {
+            containers.dragAndDrop.style.display = "none";
+            containers.dadResult.style.display = "block";
         }
     }
 
@@ -93,6 +105,7 @@ export default function Home() {
                 </div>
 
                 <div className="mainCon">
+                    {DAD === "DAD" && <DADmap />}
                     <Main />
                 </div>
             </div>
