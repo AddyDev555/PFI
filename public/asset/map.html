@@ -36,7 +36,7 @@
 
         let drawingEnabled = false;
         let isDrawing = false;
-        let geoStrokes = []; // Will store strokes with their geographical coordinates
+        let geoStrokes = []; 
         let currentGeoStroke = null;
 
 
@@ -243,18 +243,28 @@
                 this.innerText = drawingEnabled ? "Disable Drawing" : "Enable Drawing";
             });
 
+            drawCanvas.addEventListener('contextmenu', function(e) {
+                e.preventDefault(); 
+                if (drawingEnabled && geoStrokes.length > 0) {
+                    geoStrokes.pop(); 
+                    redrawStrokes();  
+                }
+            });
+
             drawCanvas.addEventListener('mousedown', function (e) {
-                if (!drawingEnabled) return;
-                isDrawing = true;
-                const geoPoint = screenToGeo(e.offsetX, e.offsetY, map);
-                currentGeoStroke = {
-                    points: [{
-                        screen: { x: e.offsetX, y: e.offsetY },
-                        geo: { lat: geoPoint.lat, lng: geoPoint.lng }
-                    }]
-                };
-                drawCtx.beginPath();
-                drawCtx.moveTo(e.offsetX, e.offsetY);
+                if (e.buttons == 1) {
+                    if (!drawingEnabled) return;
+                    isDrawing = true;
+                    const geoPoint = screenToGeo(e.offsetX, e.offsetY, map);
+                    currentGeoStroke = {
+                        points: [{
+                            screen: { x: e.offsetX, y: e.offsetY },
+                            geo: { lat: geoPoint.lat, lng: geoPoint.lng }
+                        }]
+                    };
+                    drawCtx.beginPath();
+                    drawCtx.moveTo(e.offsetX, e.offsetY);
+                }
             });
 
             drawCanvas.addEventListener('mousemove', function (e) {
@@ -266,7 +276,7 @@
                     });
                     drawCtx.lineTo(e.offsetX, e.offsetY);
                     drawCtx.strokeStyle = 'red';
-                    drawCtx.lineWidth = 3;
+                    drawCtx.lineWidth = getStrokeWidth(map);
                     drawCtx.stroke();
                 }
             });
@@ -310,6 +320,12 @@
                 return point;
             }
 
+            function getStrokeWidth(map) {
+                const zoom = map.getZoom();
+                const baseWidth = 3; 
+                return baseWidth * Math.pow(1.2, zoom - mapOptions.minZoom); 
+            }
+
             function redrawStrokes() {
                 drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
                 
@@ -334,7 +350,7 @@
                         }
                         
                         drawCtx.strokeStyle = 'red';
-                        drawCtx.lineWidth = 3;
+                        drawCtx.lineWidth = getStrokeWidth(map);
                         drawCtx.stroke();
                     }
                 });
@@ -358,7 +374,7 @@
                     }
                     
                     drawCtx.strokeStyle = 'red';
-                    drawCtx.lineWidth = 3;
+                    drawCtx.lineWidth = getStrokeWidth(map);
                     drawCtx.stroke();
                 }
             }

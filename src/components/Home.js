@@ -86,12 +86,12 @@ export default function Home() {
                         <h2>Himalayan Ranges</h2>
                         <span className='activityHeader'>Activity 2: Drag and Drop</span>
                         <ul>
-                            <li><i class="fi fi-bs-mountain mount"></i>Range1</li>
-                            <li><i class="fi fi-bs-mountain mount"></i>Range2</li>
-                            <li><i class="fi fi-bs-mountain mount"></i>Range3</li>
-                            <li><i class="fi fi-bs-mountain mount"></i>Range4</li>
-                            <li><i class="fi fi-bs-mountain mount"></i>Range5</li>
-                            <li><i class="fi fi-bs-mountain mount"></i>Range6</li>
+                            <li><i className="fi fi-bs-mountain mount"></i>Range1</li>
+                            <li><i className="fi fi-bs-mountain mount"></i>Range2</li>
+                            <li><i className="fi fi-bs-mountain mount"></i>Range3</li>
+                            <li><i className="fi fi-bs-mountain mount"></i>Range4</li>
+                            <li><i className="fi fi-bs-mountain mount"></i>Range5</li>
+                            <li><i className="fi fi-bs-mountain mount"></i>Range6</li>
                         </ul>
                         <button onClick={submitAns} className='submitBtn'>Submit</button>
                     </div>
