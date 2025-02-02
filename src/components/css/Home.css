@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap');
+@import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-straight/css/uicons-bold-straight.css');
 
 .paint-active {
     cursor: crosshair;
@@ -156,4 +157,53 @@ hr{
     text-align: justify;
     font-size: 0.8rem;
     margin-top: 3px;
+}
+
+.himalayasDragAndDropCon{
+    margin-top: 20px;
+    padding: 0 7px;
+    display: none;
+}
+
+.himalayasDragAndDropCon h2{
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.himalayasDragAndDropCon ul{
+    padding-left: 0;
+}
+
+.himalayasDragAndDropCon li{
+    width: fit-content;
+    cursor: grab;
+    user-select: none;
+    margin-bottom: 15px;
+    background-color: whitesmoke;
+    padding: 5px 10px;
+    border-radius: 5px;
+    list-style: none;
+    font-size: 0.9rem;
+}
+
+.himalayasDADResult{
+    margin-top: 20px;
+    padding: 0 7px;
+    display: none;
+}
+
+.himalayasDADResult h2{
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.himalayasDADResult p{
+    text-align: justify;
+    font-size: 0.8rem;
+    margin-top: 3px;
+}
+
+.mount{
+    margin-right: 5px;
+    color: darkcyan;
 }

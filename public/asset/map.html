@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,19 +7,16 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@latest/dist/leaflet.css" />
     <link rel="stylesheet" href="/asset/map.css" />
 </head>
-
 <body>
     <div id="map" data-tap-disabled="true">
         <canvas id="overlayCanvas"></canvas>
     </div>
     <div class="opacitySlider">
-        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1"
-            oninput="window.updateOpacity(this.value)" />
-        <p id="opacityValue">Opacity: 1</p>
+        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="0" oninput="window.updateOpacity(this.value)" />
+        <p id="opacityValue">Scroll for Hint's: 0</p>
     </div>
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script>
-
         let containerPoints = {};
         const imageCache = {};
         let startX = 0;
@@ -28,7 +24,12 @@
         let isDragging = false;
         let clientX = 0;
         let clientY = 0;
-        let opacityValue = 1;
+        let opacityValue = 0;
+        let painting = false;
+        let lastX = 0;
+        let lastY = 0;
+        const paintColor = 'blue';
+        const paintWidth = 5;
 
         var mapOptions = {
             center: [19.0760, 72.8777],
@@ -75,11 +76,9 @@
         }
 
         function main() {
-
             const map = L.map('map', mapOptions);
 
             L.tileLayer('http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}').addTo(map);
-            // http://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x} Physical
 
             const overlayCanvas = document.getElementById('overlayCanvas');
             const ctx = overlayCanvas.getContext('2d');
@@ -98,12 +97,10 @@
                     for (const [name, point] of Object.entries(containerPoints)) {
                         const img = imageCache[name];
                         if (img && img.complete) {
-
                             const baseWidth = 376.80;
                             const baseHeight = 391.20;
                             const imgWidth = baseWidth * scaleFactor;
                             const imgHeight = baseHeight * scaleFactor;
-
                             ctx.drawImage(img, point.x - imgWidth / 2, point.y - imgHeight / 2, imgWidth, imgHeight);
                         }
                     }
@@ -121,14 +118,11 @@
             });
 
             map.whenReady(async function () {
-
                 await preloadImages();
-
                 map.fire('resize');
                 for (const [name, latLng] of Object.entries(pointsData)) {
                     containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
                 }
-
                 drawPoints();
 
                 setInterval(() => {
@@ -136,49 +130,47 @@
                 }, 2000);
             });
 
-
-            function handleEvent(eventName, e) {
-                try {
-                    if (e && (e.originalEvent?.type || e.type)) {
-                        const clientX = e.originalEvent?.clientX || e.clientX || e.changedTouches?.[0]?.clientX;
-                        const clientY = e.originalEvent?.clientY || e.clientY || e.changedTouches?.[0]?.clientY;
-
-                        if (clientX !== undefined && clientY !== undefined) {
-                            if (eventName === 'movestart' || eventName === 'pointerdown') {
-                                startX = clientX;
-                                startY = clientY;
-                                isDragging = true;
-                            } else if ((eventName === 'drag' || eventName === 'touchmove') && isDragging) {
-                                const dragDeltaX = clientX - startX;
-                                const dragDeltaY = clientY - startY;
-
-                                for (const [name, point] of Object.entries(containerPoints)) {
-                                    containerPoints[name].x += dragDeltaX;
-                                    containerPoints[name].y += dragDeltaY;
-                                }
-
-                                startX = clientX;
-                                startY = clientY;
-                            } else if (eventName === 'pointerup' || eventName === 'touchend') {
-                                isDragging = false;
-                            }
-
-                            drawPoints();
-                        }
-                    }
-                } catch (error) {
-                    console.error('Logging error:', error);
-                }
+            function startPaint(e) {
+                painting = true;
+                lastX = e.clientX || e.touches[0].clientX;
+                lastY = e.clientY || e.touches[0].clientY;
             }
 
-            overlayCanvas.addEventListener('pointerdown', function (e) { handleEvent('pointerdown', e); map.dragging.enable(); });
-            overlayCanvas.addEventListener('pointerup', function (e) { handleEvent('pointerup', e); map.dragging.disable(); });
-            overlayCanvas.addEventListener('touchmove', function (e) { if (e.touches.length === 1) { handleEvent('touchmove', e); } });
-            overlayCanvas.addEventListener('mouseleave', function () { map.dragging.disable(); });
-            overlayCanvas.addEventListener('mousedown', function (e) { handleEvent('movestart', e); map.dragging.enable(); });
-            overlayCanvas.addEventListener('mouseup', function (e) { handleEvent('moveend', e); map.dragging.disable(); });
+            function stopPaint() {
+                painting = false;
+            }
 
-            map.on('drag', function (e) { handleEvent('drag', e); });
+            function drawPaint(e) {
+                if (!painting) return;
+                const currentX = e.clientX || e.touches[0].clientX;
+                const currentY = e.clientY || e.touches[0].clientY;
+
+                ctx.beginPath();
+                ctx.moveTo(lastX - overlayCanvas.offsetLeft, lastY - overlayCanvas.offsetTop);
+                ctx.lineTo(currentX - overlayCanvas.offsetLeft, currentY - overlayCanvas.offsetTop);
+                ctx.strokeStyle = paintColor;
+                ctx.lineWidth = paintWidth;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+                ctx.closePath();
+
+                lastX = currentX;
+                lastY = currentY;
+            }
+
+            overlayCanvas.addEventListener('mousedown', startPaint);
+            overlayCanvas.addEventListener('mouseup', stopPaint);
+            overlayCanvas.addEventListener('mousemove', drawPaint);
+
+            overlayCanvas.addEventListener('touchstart', startPaint);
+            overlayCanvas.addEventListener('touchend', stopPaint);
+            overlayCanvas.addEventListener('touchmove', drawPaint);
+
+            overlayCanvas.addEventListener('mouseleave', stopPaint);
+
+            map.on('drag', function (e) {
+                drawPoints();
+            });
 
             map.on('zoomend', function (e) {
                 for (const [name, latLng] of Object.entries(pointsData)) {
@@ -196,12 +188,9 @@
             }
 
             window.updateOpacity = updateOpacity;
-
         }
 
         document.addEventListener('DOMContentLoaded', main);
-
     </script>
 </body>
-
 </html>
