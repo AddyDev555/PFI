@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import "./css/Home.css";
-import Main from './Main';
+import DAS from './DASmap';
 import DADmap from './DADmap';
 
 export default function Home() {
@@ -106,7 +106,7 @@ export default function Home() {
 
                 <div className="mainCon">
                     {DAD === "DAD" && <DADmap />}
-                    <Main />
+                    <DAS />
                 </div>
             </div>
         </main>
