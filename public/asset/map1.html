@@ -10,16 +10,21 @@
 </head>
 
 <body>
+
     <div id="map" data-tap-disabled="true">
         <canvas id="overlayCanvas"></canvas>
         <canvas id="drawCanvas"></canvas>
     </div>
+
     <div class="opacitySlider">
     <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1" oninput="window.updateOpacity(this.value)" />
     </div>
+
     <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile Provider</button>
     <button id="toggleDraw" style="position: absolute; bottom: 50px; right: 10px; z-index: 1000;">Enable Drawing</button>
     <button id="compareDraw" style="position: absolute; bottom: 90px; right: 10px; z-index: 1000;">Compare Area</button>
+    <button id="pause" style="position: absolute; bottom: 130px; right: 10px; z-index: 1000;">Pause</button>
+    <button id="undo" style="position: absolute; bottom: 170px; right: 10px; z-index: 1000;">Undo</button>
 
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script>
@@ -38,13 +43,11 @@
         let geoStrokes = []; 
         let currentGeoStroke = null;
 
+        let isPaused = false;
 
         const tileProviders = [
             'http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-            'http://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}',
-            'http://services.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
-            'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            'http://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}'
         ];
         let currentTileProvider = 0;
 
@@ -61,6 +64,12 @@
             touchZoom: false,
             dragging: true  
         };
+
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const ctx = overlayCanvas.getContext('2d');
+
+        const drawCanvas = document.getElementById('drawCanvas');
+        const drawCtx = drawCanvas.getContext('2d');
 
         const pointsData = [
             {
@@ -98,12 +107,6 @@
             const map = L.map('map', mapOptions);
 
             let tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
-
-            const overlayCanvas = document.getElementById('overlayCanvas');
-            const ctx = overlayCanvas.getContext('2d');
-
-            const drawCanvas = document.getElementById('drawCanvas');
-            const drawCtx = drawCanvas.getContext('2d');
 
             function drawPoints() {
                 if (!ctx) return;
@@ -230,6 +233,8 @@
             document.getElementById('toggleDraw').addEventListener('click', function () {
                 drawingEnabled = !drawingEnabled;
 
+                document.body.style.cursor = (document.body.style.cursor === "crosshair") ? "default" : "crosshair";
+
                 if (drawingEnabled) {
                     map.dragging.disable();
                     drawCanvas.style.zIndex = '402';
@@ -251,9 +256,21 @@
                 }
             });
 
+            document.getElementById('undo').addEventListener('click', function () {
+                if (drawingEnabled && geoStrokes.length > 0) {
+                    geoStrokes.pop(); 
+                    redrawStrokes();  
+                }
+            });
+
+            document.getElementById('pause').addEventListener('click', function () {
+                isPaused = !isPaused;
+                this.innerText = isPaused ? "Resume" : "Pause";
+            });
+
             drawCanvas.addEventListener('touchstart', function(e) {
                 e.preventDefault(); 
-                if (e.touches.length === 1) {
+                if (e.touches.length === 1 && !isPaused) {
                     map.dragging.disable();
                     if (!drawingEnabled) return;
                     
@@ -278,7 +295,7 @@
 
             drawCanvas.addEventListener('touchmove', function(e) {
                 e.preventDefault(); 
-                if (e.touches.length === 1 && isDrawing) {
+                if (e.touches.length === 1 && isDrawing && !isPaused) {
                     const rect = drawCanvas.getBoundingClientRect();
                     const x = e.touches[0].clientX - rect.left;
                     const y = e.touches[0].clientY - rect.top;
@@ -293,7 +310,7 @@
                     drawCtx.strokeStyle = 'red';
                     drawCtx.lineWidth = getStrokeWidth(map);
                     drawCtx.stroke();
-                } else if (e.touches.length === 2) {
+                } else if (e.touches.length === 1 && isPaused) {
                     map.dragging.enable();
                     handleEvent('touchmove', e);
                 }
@@ -301,7 +318,7 @@
 
             drawCanvas.addEventListener('touchend', function(e) {
                 e.preventDefault();
-                if (isDrawing) {
+                if (isDrawing && !isPaused) {
                     geoStrokes.push(currentGeoStroke);
                     currentGeoStroke = null;
                     isDrawing = false;
@@ -309,7 +326,7 @@
             });
 
             drawCanvas.addEventListener('mousedown', function (e) {
-                if (e.buttons == 1) {
+                if (e.buttons == 1  && !isPaused) {
                     map.dragging.disable();
                     if (!drawingEnabled) return;
                     isDrawing = true;
@@ -322,6 +339,9 @@
                     };
                     drawCtx.beginPath();
                     drawCtx.moveTo(e.offsetX, e.offsetY);
+                } else if (e.buttons == 1  && isPaused) {
+                    map.dragging.enable();
+                    handleEvent('movestart', e);
                 } else if (e.buttons == 4) {
                     map.dragging.enable();
                     handleEvent('movestart', e);
@@ -342,7 +362,7 @@
                 }
             });
 
-            drawCanvas.addEventListener('mouseup', function () {
+            drawCanvas.addEventListener('mouseup', function (e) {
                 if (isDrawing) {
                     geoStrokes.push(currentGeoStroke);
                     currentGeoStroke = null;
