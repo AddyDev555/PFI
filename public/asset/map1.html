@@ -51,14 +51,15 @@
         var mapOptions = {
             center: [19.0760, 72.8777],
             zoom: 4,
-            zoomControl: false,
+            zoomControl: true,
             tap: false,
-            touchZoom: true,
             scrollWheelZoom: true,
             doubleClickZoom: false,
             minZoom: 4,
             maxZoom: 11,
-            attributionControl: false
+            attributionControl: false,
+            touchZoom: false,
+            dragging: true  
         };
 
         const pointsData = [
@@ -250,8 +251,64 @@
                 }
             });
 
+            drawCanvas.addEventListener('touchstart', function(e) {
+                e.preventDefault(); 
+                if (e.touches.length === 1) {
+                    map.dragging.disable();
+                    if (!drawingEnabled) return;
+                    
+                    isDrawing = true;
+                    
+                    const rect = drawCanvas.getBoundingClientRect();
+                    const x = e.touches[0].clientX - rect.left;
+                    const y = e.touches[0].clientY - rect.top;
+                    
+                    const geoPoint = screenToGeo(x, y, map);
+                    currentGeoStroke = {
+                        points: [{
+                            screen: { x, y },
+                            geo: { lat: geoPoint.lat, lng: geoPoint.lng }
+                        }]
+                    };
+                    
+                    drawCtx.beginPath();
+                    drawCtx.moveTo(x, y);
+                }
+            });
+
+            drawCanvas.addEventListener('touchmove', function(e) {
+                e.preventDefault(); 
+                if (e.touches.length === 1 && isDrawing) {
+                    const rect = drawCanvas.getBoundingClientRect();
+                    const x = e.touches[0].clientX - rect.left;
+                    const y = e.touches[0].clientY - rect.top;
+                    
+                    const geoPoint = screenToGeo(x, y, map);
+                    currentGeoStroke.points.push({
+                        screen: { x, y },
+                        geo: { lat: geoPoint.lat, lng: geoPoint.lng }
+                    });
+                    
+                    drawCtx.lineTo(x, y);
+                    drawCtx.strokeStyle = 'red';
+                    drawCtx.lineWidth = getStrokeWidth(map);
+                    drawCtx.stroke();
+                } else if (e.touches.length === 2) {
+                    map.dragging.enable();
+                    handleEvent('touchmove', e);
+                }
+            });
+
+            drawCanvas.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                if (isDrawing) {
+                    geoStrokes.push(currentGeoStroke);
+                    currentGeoStroke = null;
+                    isDrawing = false;
+                }
+            });
+
             drawCanvas.addEventListener('mousedown', function (e) {
-                console.log(e)
                 if (e.buttons == 1) {
                     map.dragging.disable();
                     if (!drawingEnabled) return;
@@ -267,6 +324,7 @@
                     drawCtx.moveTo(e.offsetX, e.offsetY);
                 } else if (e.buttons == 4) {
                     map.dragging.enable();
+                    handleEvent('movestart', e);
                 }
             });
 
@@ -289,6 +347,8 @@
                     geoStrokes.push(currentGeoStroke);
                     currentGeoStroke = null;
                     isDrawing = false;
+                } else {
+                    handleEvent('moveend', e);
                 }
             });
 
