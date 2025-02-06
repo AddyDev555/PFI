@@ -20,16 +20,83 @@
         <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1"
             oninput="window.updateOpacity(this.value)" />
     </div>
-    
+
+    <div class="DADRangesCanvas">
+        <canvas id="DADCanvas"></canvas>
+    </div>
+
     <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile
         Provider</button>
 
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
+
+    <script>
+        const canvas = document.getElementById("DADCanvas");
+        const ctx = canvas.getContext("2d");
+
+        const textObjects = [
+        { id: "title1", text: "Himalayan Ranges", x: 21, y: 20, font: "13px Arial", color: "black" },
+        { id: "title2", text: " Drag and Drop Activity", x: 23, y: 40, font: "10px Arial", color: "black" },
+    ];
+
+    const fixedBoxes2 = [
+            { lat: 29.9668322, lng: 70.6887817, width: 60, height: 20, id: "Sulaiman Range" },
+            { lat: 24.9412382, lng: 74.4969177, width: 60, height: 20, id: "Aravali Range" },
+            { lat: 21.6223244, lng: 71.2545776, width: 60, height: 20, id: "Gir Range" },
+            { lat: 22.5468059, lng: 77.2531127, width: 60, height: 20, id: "Vindhya Range" },
+            { lat: 21.3712443, lng: 76.2231445, width: 60, height: 20, id: "Satpura Range" },
+            { lat: 21.2816967, lng: 80.4144287, width: 60, height: 20, id: "Mahadeo Hills" },
+            { lat: 16.5154201, lng: 73.9764502, width: 60, height: 20, id: "Western Ghats" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Eastern Ghats" },
+            { lat: 25.0059726, lng: 91.4941406, width: 60, height: 20, id: "Garo Khasi Jaintia" },
+            { lat: 23.3674713, lng: 93.0651855, width: 60, height: 20, id: "Mizo Hills" },
+            { lat: 25.7998911, lng: 95.6250000, width: 60, height: 20, id: "Naga Hills" },
+            { lat: 27.4302897, lng: 97.7014160, width: 60, height: 20, id: "Patkai Bum" },
+            { lat: 36.8092847, lng: 70.7958984, width: 60, height: 20, id: "Hindu Kush" },
+            { lat: 38.5695599, lng: 74.4816792, width: 60, height: 20, id: "Pamir Knot" },
+            { lat: 37.1953305, lng: 79.8706054, width: 60, height: 20, id: "Kunlun Mt.s" },
+            { lat: 30.1831218, lng: 77.4316406, width: 60, height: 20, id: "Shiwalik Range" },
+            { lat: 33.8704155, lng: 76.7944335, width: 60, height: 20, id: "Zaskar Range" },
+            { lat: 35.2276723, lng: 75.8825683, width: 60, height: 20, id: "Ladakh Range" },
+            { lat: 31.4755240, lng: 81.1230468, width: 60, height: 20, id: "Kailash Range" },
+            { lat: 36.0135605, lng: 76.4648437, width: 60, height: 20, id: "Karakoram Range" },
+            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Greater Himalaya" },
+            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Middle Himalaya" },
+            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Dafla Hills" }
+        ];
+
+    fixedBoxes2.forEach((box, index) => {
+        textObjects.push({
+            id: box.id,
+            text: box.id,
+            x: 23,
+            y: 70 + index * 30,
+            font: "15px Arial",
+            color: "gray"
+        });
+    });
+
+    canvas.height = Math.max(textObjects.length * 30 + 100, 500);
+
+    function drawTexts() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+        textObjects.forEach(obj => {
+            ctx.font = obj.font;
+            ctx.fillStyle = obj.color;
+            ctx.fillText(obj.text, obj.x, obj.y);
+        });
+    }
+
+    drawTexts();
+
+    </script>
+
     <script>
 
         let baseWidth = 376.80;
         let baseHeight = 391.20;
-   
+
         let containerPoint = {};
         const imageCache = {};
         let startX = 0;
@@ -74,7 +141,7 @@
             { "img": "mnt/rakaposhi.png" }
         ];
 
-        let commonLatLng = { "lat": 24.351399328153236, "lng": 81.9337890625 }; 
+        let commonLatLng = { "lat": 24.351399328153236, "lng": 81.9337890625 };
 
         const fixedBoxes = [
             { lat: 29.9668322, lng: 70.6887817, width: 60, height: 20, id: "Sulaiman Range" },
@@ -137,15 +204,15 @@
                     const zoomLevel = map.getZoom();
                     const scaleFactor = Math.pow(2, zoomLevel - mapOptions.minZoom);
 
-                    pointsData_def.forEach(point => {  
-                                const img = imageCache[point.img];
-                                if (img && img.complete) {
-                                    const imgWidth = baseWidth * scaleFactor;
-                                    const imgHeight = baseHeight * scaleFactor;
+                    pointsData_def.forEach(point => {
+                        const img = imageCache[point.img];
+                        if (img && img.complete) {
+                            const imgWidth = baseWidth * scaleFactor;
+                            const imgHeight = baseHeight * scaleFactor;
 
-                                    ctx.drawImage(img, containerPoint.x - imgWidth / 2, containerPoint.y - imgHeight / 2, imgWidth, imgHeight);
-                                }
-                            });
+                            ctx.drawImage(img, containerPoint.x - imgWidth / 2, containerPoint.y - imgHeight / 2, imgWidth, imgHeight);
+                        }
+                    });
                 });
             }
 
@@ -254,7 +321,7 @@
             map.on('zoomend', function (e) {
 
                 containerPoint = map.latLngToContainerPoint([commonLatLng.lat, commonLatLng.lng]);
-                
+
                 drawPoints();
                 drawFixedBoxes()
             });
