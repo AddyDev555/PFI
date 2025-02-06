@@ -29,7 +29,10 @@
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script>
 
-        let containerPoints = {};
+        let baseWidth = 376.80;
+        let baseHeight = 391.20;
+
+        let containerPoint = {};
         const imageCache = {};
         let startX = 0;
         let startY = 0;
@@ -59,7 +62,7 @@
             scrollWheelZoom: true,
             doubleClickZoom: false,
             minZoom: 4,
-            maxZoom: 11,
+            maxZoom: 8,
             attributionControl: false,
             touchZoom: false,
             dragging: true  
@@ -71,31 +74,28 @@
         const drawCanvas = document.getElementById('drawCanvas');
         const drawCtx = drawCanvas.getContext('2d');
 
-        const pointsData = [
-            {
-                "img": "mapHR.png",
-                "lat": 24.351399328153236,
-                "lng": 81.9337890625
-            },
-            {
-                "img": "mapHM.png",
-                "lat": 24.351399328153236,
-                "lng": 81.9337890625
-            },
-            {
-                "img": "mapRR.png",
-                "lat": 24.351399328153236,
-                "lng": 81.9337890625
-            },
-            {
-                "img": "mapRM.png",
-                "lat": 24.351399328153236,
-                "lng": 81.9337890625
-            }
+        const pointsData_def = [
+            { "img": "mapAR.png" },
+            { "img": "mnt/anai mudi.png" },
+            { "img": "mnt/anna purna.png" },
+            { "img": "mnt/dhaula giri.png" },
+            { "img": "mnt/gurla mandhata.png" },
+            { "img": "mnt/k2.png" },
+            { "img": "mnt/kamet.png" },
+            { "img": "mnt/kanchenjunga.png" },
+            { "img": "mnt/mahendragiri.png" },
+            { "img": "mnt/makalu.png" },
+            { "img": "mnt/mt. everest.png" },
+            { "img": "mnt/namcha barwa.png" },
+            { "img": "mnt/nanda devi.png" },
+            { "img": "mnt/nanga parbat.png" },
+            { "img": "mnt/rakaposhi.png" }
         ];
 
+        let commonLatLng = { "lat": 24.351399328153236, "lng": 81.9337890625 };
+
         function preloadImages() {
-            const preloadPromises = pointsData.map((point) => {
+            const preloadPromises = pointsData_def.map((point) => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.src = point.img;
@@ -124,18 +124,15 @@
                     const zoomLevel = map.getZoom();
                     const scaleFactor = Math.pow(2, zoomLevel - mapOptions.minZoom);
 
-                    for (const [name, point] of Object.entries(containerPoints)) {
-                        const img = imageCache[name];
-                        if (img && img.complete) {
+                    pointsData_def.forEach(point => {  
+                                const img = imageCache[point.img];
+                                if (img && img.complete) {
+                                    const imgWidth = baseWidth * scaleFactor;
+                                    const imgHeight = baseHeight * scaleFactor;
 
-                            const baseWidth = 376.80;
-                            const baseHeight = 391.20;
-                            const imgWidth = baseWidth * scaleFactor;
-                            const imgHeight = baseHeight * scaleFactor;
-
-                            ctx.drawImage(img, point.x - imgWidth / 2, point.y - imgHeight / 2, imgWidth, imgHeight);
-                        }
-                    }
+                                    ctx.drawImage(img, containerPoint.x - imgWidth / 2, containerPoint.y - imgHeight / 2, imgWidth, imgHeight);
+                                }
+                            });
                 });
             }
 
@@ -145,9 +142,9 @@
                 overlayCanvas.height = size.y;
                 drawCanvas.width = size.x;
                 drawCanvas.height = size.y;
-                for (const [name, latLng] of Object.entries(pointsData)) {
-                    containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
-                }
+
+                containerPoint = map.latLngToContainerPoint([commonLatLng.lat, commonLatLng.lng]);
+
                 drawPoints();
                 redrawStrokes();
             });
@@ -157,9 +154,8 @@
                 await preloadImages();
 
                 map.fire('resize');
-                for (const [name, latLng] of Object.entries(pointsData)) {
-                    containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
-                }
+
+                containerPoint = map.latLngToContainerPoint([commonLatLng.lat, commonLatLng.lng]);
 
                 drawPoints();
 
@@ -184,10 +180,8 @@
                                 const dragDeltaX = clientX - startX;
                                 const dragDeltaY = clientY - startY;
 
-                                for (const [name, point] of Object.entries(containerPoints)) {
-                                    containerPoints[name].x += dragDeltaX;
-                                    containerPoints[name].y += dragDeltaY;
-                                }
+                                containerPoint.x += dragDeltaX;
+                                containerPoint.y += dragDeltaY;
 
                                 startX = clientX;
                                 startY = clientY;
@@ -214,9 +208,9 @@
             map.on('drag', function (e) { handleEvent('drag', e); });
 
             map.on('zoomend', function (e) {
-                for (const [name, latLng] of Object.entries(pointsData)) {
-                    containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
-                }
+
+                containerPoint = map.latLngToContainerPoint([commonLatLng.lat, commonLatLng.lng]);
+
                 drawPoints();
                 redrawStrokes();
             });
@@ -310,7 +304,7 @@
                     });
                     
                     drawCtx.lineTo(x, y);
-                    drawCtx.strokeStyle = 'red';
+                    drawCtx.strokeStyle = 'green';
                     drawCtx.lineWidth = getStrokeWidth(map);
                     drawCtx.stroke();
                 } else if (e.touches.length === 1 && isPaused) {
@@ -358,7 +352,7 @@
                         geo: { lat: geoPoint.lat, lng: geoPoint.lng }
                     });
                     drawCtx.lineTo(e.offsetX, e.offsetY);
-                    drawCtx.strokeStyle = 'red';
+                    drawCtx.strokeStyle = 'green';
                     drawCtx.lineWidth = getStrokeWidth(map);
                     drawCtx.stroke();
                 }
@@ -393,7 +387,7 @@
                 }
 
                 const overlapRatio = overlayPixels ? (overlapPixels / overlayPixels).toFixed(2) : 0;
-                alert(`Success Rate: ${overlapRatio}`);
+                alert(`${overlapRatio * 100}% Match`);
             });
 
             function screenToGeo(x, y, map) {
@@ -437,7 +431,7 @@
                             drawCtx.lineTo(screenPoint.x, screenPoint.y);
                         }
                         
-                        drawCtx.strokeStyle = 'red';
+                        drawCtx.strokeStyle = 'green';
                         drawCtx.lineWidth = getStrokeWidth(map);
                         drawCtx.stroke();
                     }
@@ -461,7 +455,7 @@
                         drawCtx.lineTo(screenPoint.x, screenPoint.y);
                     }
                     
-                    drawCtx.strokeStyle = 'red';
+                    drawCtx.strokeStyle = 'green';
                     drawCtx.lineWidth = getStrokeWidth(map);
                     drawCtx.stroke();
                 }

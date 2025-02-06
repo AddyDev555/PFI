@@ -27,7 +27,10 @@
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script>
 
-        let containerPoints = {};
+        let baseWidth = 376.80;
+        let baseHeight = 391.20;
+   
+        let containerPoint = {};
         const imageCache = {};
         let startX = 0;
         let startY = 0;
@@ -49,32 +52,29 @@
             scrollWheelZoom: true,
             doubleClickZoom: false,
             minZoom: 4,
-            maxZoom: 11,
+            maxZoom: 8,
             attributionControl: false
         };
 
-        const pointsData = [
-            {
-                "img": "mapHR.png",
-                "lat": 24.351399328153236,
-                "lng": 81.9337890625
-            },
-            {
-                "img": "mapHM.png",
-                "lat": 24.351399328153236,
-                "lng": 81.9337890625
-            },
-            {
-                "img": "mapRR.png",
-                "lat": 24.351399328153236,
-                "lng": 81.9337890625
-            },
-            {
-                "img": "mapRM.png",
-                "lat": 24.351399328153236,
-                "lng": 81.9337890625
-            }
+        const pointsData_def = [
+            { "img": "mapAR.png" },
+            { "img": "mnt/anai mudi.png" },
+            { "img": "mnt/anna purna.png" },
+            { "img": "mnt/dhaula giri.png" },
+            { "img": "mnt/gurla mandhata.png" },
+            { "img": "mnt/k2.png" },
+            { "img": "mnt/kamet.png" },
+            { "img": "mnt/kanchenjunga.png" },
+            { "img": "mnt/mahendragiri.png" },
+            { "img": "mnt/makalu.png" },
+            { "img": "mnt/mt. everest.png" },
+            { "img": "mnt/namcha barwa.png" },
+            { "img": "mnt/nanda devi.png" },
+            { "img": "mnt/nanga parbat.png" },
+            { "img": "mnt/rakaposhi.png" }
         ];
+
+        let commonLatLng = { "lat": 24.351399328153236, "lng": 81.9337890625 }; 
 
         const fixedBoxes = [
             { lat: 29.9668322, lng: 70.6887817, width: 60, height: 20, id: "Sulaiman Range" },
@@ -85,21 +85,25 @@
             { lat: 21.2816967, lng: 80.4144287, width: 60, height: 20, id: "Mahadeo Hills" },
             { lat: 16.5154201, lng: 73.9764502, width: 60, height: 20, id: "Western Ghats" },
             { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Eastern Ghats" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Garo Khasi Jaintia" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Mizo Hills" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Naga Hills" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Patkai Bum" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Hindu Kush" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Pamir Knot" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Kunlun Mt.s" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Shiwalik Range" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Zaskar Range" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Ladakh Range" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Karakoram Range" }
+            { lat: 25.0059726, lng: 91.4941406, width: 60, height: 20, id: "Garo Khasi Jaintia" },
+            { lat: 23.3674713, lng: 93.0651855, width: 60, height: 20, id: "Mizo Hills" },
+            { lat: 25.7998911, lng: 95.6250000, width: 60, height: 20, id: "Naga Hills" },
+            { lat: 27.4302897, lng: 97.7014160, width: 60, height: 20, id: "Patkai Bum" },
+            { lat: 36.8092847, lng: 70.7958984, width: 60, height: 20, id: "Hindu Kush" },
+            { lat: 38.5695599, lng: 74.4816792, width: 60, height: 20, id: "Pamir Knot" },
+            { lat: 37.1953305, lng: 79.8706054, width: 60, height: 20, id: "Kunlun Mt.s" },
+            { lat: 30.1831218, lng: 77.4316406, width: 60, height: 20, id: "Shiwalik Range" },
+            { lat: 33.8704155, lng: 76.7944335, width: 60, height: 20, id: "Zaskar Range" },
+            { lat: 35.2276723, lng: 75.8825683, width: 60, height: 20, id: "Ladakh Range" },
+            { lat: 31.4755240, lng: 81.1230468, width: 60, height: 20, id: "Kailash Range" },
+            { lat: 36.0135605, lng: 76.4648437, width: 60, height: 20, id: "Karakoram Range" },
+            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Greater Himalaya" },
+            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Middle Himalaya" },
+            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Dafla Hills" }
         ];
 
         function preloadImages() {
-            const preloadPromises = pointsData.map((point) => {
+            const preloadPromises = pointsData_def.map((point) => {
                 return new Promise((resolve) => {
                     const img = new Image();
                     img.src = point.img;
@@ -133,18 +137,15 @@
                     const zoomLevel = map.getZoom();
                     const scaleFactor = Math.pow(2, zoomLevel - mapOptions.minZoom);
 
-                    for (const [name, point] of Object.entries(containerPoints)) {
-                        const img = imageCache[name];
-                        if (img && img.complete) {
+                    pointsData_def.forEach(point => {  
+                                const img = imageCache[point.img];
+                                if (img && img.complete) {
+                                    const imgWidth = baseWidth * scaleFactor;
+                                    const imgHeight = baseHeight * scaleFactor;
 
-                            const baseWidth = 376.80;
-                            const baseHeight = 391.20;
-                            const imgWidth = baseWidth * scaleFactor;
-                            const imgHeight = baseHeight * scaleFactor;
-
-                            ctx.drawImage(img, point.x - imgWidth / 2, point.y - imgHeight / 2, imgWidth, imgHeight);
-                        }
-                    }
+                                    ctx.drawImage(img, containerPoint.x - imgWidth / 2, containerPoint.y - imgHeight / 2, imgWidth, imgHeight);
+                                }
+                            });
                 });
             }
 
@@ -186,9 +187,9 @@
                 overlayCanvas.height = size.y;
                 drawCanvas.width = size.x;
                 drawCanvas.height = size.y;
-                for (const [name, latLng] of Object.entries(pointsData)) {
-                    containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
-                }
+
+                containerPoint = map.latLngToContainerPoint([commonLatLng.lat, commonLatLng.lng]);
+
                 drawPoints();
                 drawFixedBoxes()
             });
@@ -198,9 +199,8 @@
                 await preloadImages();
 
                 map.fire('resize');
-                for (const [name, latLng] of Object.entries(pointsData)) {
-                    containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
-                }
+
+                containerPoint = map.latLngToContainerPoint([commonLatLng.lat, commonLatLng.lng]);
 
                 drawPoints();
 
@@ -224,10 +224,8 @@
                                 const dragDeltaX = clientX - startX;
                                 const dragDeltaY = clientY - startY;
 
-                                for (const [name, point] of Object.entries(containerPoints)) {
-                                    containerPoints[name].x += dragDeltaX;
-                                    containerPoints[name].y += dragDeltaY;
-                                }
+                                containerPoint.x += dragDeltaX;
+                                containerPoint.y += dragDeltaY;
 
                                 startX = clientX;
                                 startY = clientY;
@@ -254,9 +252,9 @@
             map.on('drag', function (e) { handleEvent('drag', e); });
 
             map.on('zoomend', function (e) {
-                for (const [name, latLng] of Object.entries(pointsData)) {
-                    containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
-                }
+
+                containerPoint = map.latLngToContainerPoint([commonLatLng.lat, commonLatLng.lng]);
+                
                 drawPoints();
                 drawFixedBoxes()
             });
