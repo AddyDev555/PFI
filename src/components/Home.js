@@ -4,12 +4,8 @@ import DAS from './DASmap';
 import DADmap from './DADmap';
 
 export default function Home() {
-    const [color, setColor] = useState("");
-    const [DAD, setDAD] = useState("");
 
-    function handleColorClick(paintColor) {
-        setColor(paintColor);
-    }
+    const [DAD, setDAD] = useState("");
 
     function submitAns() {
         const containers = {
@@ -74,25 +70,7 @@ export default function Home() {
                     <div className="himalayas_drawCon">
                         <h2>Himalayan Ranges</h2>
                         <span className='activityHeader'>Activity 1: Coloring</span>
-                        <p>Paint the Himalayan Mountain Ranges. Select any paint and drag the mouse on the appropriate regions.</p>
-
-                        <div className="paintsCon">
-                            <h2>Colors</h2>
-                            <div
-                                className="paints"
-                                onClick={() => handleColorClick("green")}
-                            >
-                                <div className="greenColor"></div>
-                                <span>Green</span>
-                            </div>
-                            <div
-                                className="paints"
-                                onClick={() => handleColorClick("brown")}
-                            >
-                                <div className="brownColor"></div>
-                                <span>Brown</span>
-                            </div>
-                        </div>
+                        <p>Paint the Himalayan Mountain Ranges. To start painting select the pencil icon and drag the mouse on the appropriate regions.</p>
 
                         <p className="subTit">If the coloring is done, submit your answer.</p>
                         <button onClick={submitAns} className='submitBtn'>Submit</button>
