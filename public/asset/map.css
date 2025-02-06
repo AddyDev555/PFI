@@ -4,6 +4,7 @@ html, body {
     height: 100%; 
     margin: 0; 
     font-family: "Roboto Slab", serif;
+    overflow: hidden;
 }
 
 #map { 
@@ -30,18 +31,12 @@ html, body {
   height: 100%; 
 }
 
-.opacitySlider{
-  position: absolute;
-  top: 20px;
-  right: 0px;
-  z-index: 1000;
-}
-
 .opacitySlider input{
   width: 60%;
   height: 0.7vh;
   appearance: none;
-  background: black;
+  background: lightblue;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   cursor: grab;
 }

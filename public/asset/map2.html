@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- Head section remains the same -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,39 +9,30 @@
 </head>
 
 <body>
+
     <div id="map" data-tap-disabled="true">
         <canvas id="overlayCanvas"></canvas>
         <canvas id="drawCanvas"></canvas>
     </div>
-    <div class="opacitySlider">
-        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="0" oninput="window.updateOpacity(this.value)" />
-        <p id="opacityValue">Scroll for Hint's</p>
+
+    <div class="opacitySlider" style="position: absolute; top: 20px; right: 0px; z-index: 1000;">
+        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1" oninput="window.updateOpacity(this.value)" />
     </div>
     <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile Provider</button>
 
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script>
-        // Previous variable declarations remain the same
+   
         let containerPoints = {};
         const imageCache = {};
         let startX = 0;
         let startY = 0;
         let isDragging = false;
-        let opacityValue = 0;
-
-        const fixedBoxes = [
-            { lat: 29.00, lng: 77.00, width: 60, height: 20, radius: 5 },
-            { lat: 30.00, lng: 77.00, width: 60, height: 20, radius: 5 },
-            { lat: 21.1458, lng: 79.0882, width: 60, height: 20, radius: 5 },
-            { lat: 20.0059, lng: 75.5762, width: 60, height: 20, radius: 5 }
-        ];
+        let opacityValue = 1;
 
         const tileProviders = [
             'http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-            'http://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}',
-            'http://services.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
-            'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            'http://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}'
         ];
         let currentTileProvider = 0;
 
@@ -71,26 +61,38 @@
                 "lng": 81.9337890625
             },
             {
+                "img": "mapRR.png",
+                "lat": 24.351399328153236,
+                "lng": 81.9337890625
+            },
+            {
                 "img": "mapRM.png",
                 "lat": 24.351399328153236,
                 "lng": 81.9337890625
             }
         ];
 
-        function roundRect(ctx, x, y, width, height, radius) {
-            ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + width - radius, y);
-            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-            ctx.lineTo(x + width, y + height - radius);
-            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-            ctx.lineTo(x + radius, y + height);
-            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
-            ctx.stroke();
-        }
+        const fixedBoxes = [
+            { lat: 29.9668322, lng: 70.6887817, width: 60, height: 20, id: "Sulaiman Range" },
+            { lat: 24.9412382, lng: 74.4969177, width: 60, height: 20, id: "Aravali Range" },
+            { lat: 21.6223244, lng: 71.2545776, width: 60, height: 20, id: "Gir Range" },
+            { lat: 22.5468059, lng: 77.2531127, width: 60, height: 20, id: "Vindhya Range" },
+            { lat: 21.3712443, lng: 76.2231445, width: 60, height: 20, id: "Satpura Range" },
+            { lat: 21.2816967, lng: 80.4144287, width: 60, height: 20, id: "Mahadeo Hills" },
+            { lat: 16.5154201, lng: 73.9764502, width: 60, height: 20, id: "Western Ghats" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Eastern Ghats" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Garo Khasi Jaintia" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Mizo Hills" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Naga Hills" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Patkai Bum" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Hindu Kush" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Pamir Knot" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Kunlun Mt.s" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Shiwalik Range" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Zaskar Range" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Ladakh Range" },
+            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Karakoram Range" }
+        ];
 
         function preloadImages() {
             const preloadPromises = pointsData.map((point) => {
@@ -114,26 +116,32 @@
             const drawCanvas = document.getElementById('drawCanvas');
             const drawCtx = drawCanvas.getContext('2d');
 
-            drawCanvas.style.zIndex = '1000';
+            drawCanvas.style.zIndex = '402';
 
             function drawPoints() {
                 if (!ctx) return;
                 ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
                 ctx.globalAlpha = opacityValue;
 
-                const zoomLevel = map.getZoom();
-                const scaleFactor = Math.pow(2, zoomLevel - mapOptions.minZoom);
+                requestAnimationFrame(() => {
+                    ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+                    const zoomLevel = map.getZoom();
+                    const scaleFactor = Math.pow(2, zoomLevel - mapOptions.minZoom);
 
-                for (const [name, point] of Object.entries(containerPoints)) {
-                    const img = imageCache[name];
-                    if (img && img.complete) {
-                        const baseWidth = 376.80;
-                        const baseHeight = 391.20;
-                        const imgWidth = baseWidth * scaleFactor;
-                        const imgHeight = baseHeight * scaleFactor;
-                        ctx.drawImage(img, point.x - imgWidth / 2, point.y - imgHeight / 2, imgWidth, imgHeight);
+                    for (const [name, point] of Object.entries(containerPoints)) {
+                        const img = imageCache[name];
+                        if (img && img.complete) {
+
+                            const baseWidth = 376.80;
+                            const baseHeight = 391.20;
+                            const imgWidth = baseWidth * scaleFactor;
+                            const imgHeight = baseHeight * scaleFactor;
+
+                            ctx.drawImage(img, point.x - imgWidth / 2, point.y - imgHeight / 2, imgWidth, imgHeight);
+                        }
                     }
-                }
+                });
             }
 
             function drawFixedBoxes() {
@@ -141,26 +149,33 @@
                 drawCtx.strokeStyle = 'black';
                 drawCtx.lineWidth = 2;
 
+                const zoomLevel = map.getZoom();
+                const scaleFactor = Math.pow(1.35, zoomLevel - mapOptions.minZoom);
+
                 fixedBoxes.forEach(box => {
                     const point = map.latLngToContainerPoint([box.lat, box.lng]);
-                    roundRect(
-                        drawCtx,
-                        point.x - box.width/2,
-                        point.y - box.height/2,
-                        box.width,
-                        box.height,
-                        box.radius
-                    );
+                    const scaledWidth = box.width * scaleFactor;
+                    const scaledHeight = box.height * scaleFactor;
+                    const scaledRadius = 5 * scaleFactor;
+                    
+                    const x = point.x - scaledWidth/2;
+                    const y = point.y - scaledHeight/2;
+                    
+                    drawCtx.beginPath();
+                    drawCtx.moveTo(x + scaledRadius, y);
+                    drawCtx.lineTo(x + scaledWidth - scaledRadius, y);
+                    drawCtx.quadraticCurveTo(x + scaledWidth, y, x + scaledWidth, y + scaledRadius);
+                    drawCtx.lineTo(x + scaledWidth, y + scaledHeight - scaledRadius);
+                    drawCtx.quadraticCurveTo(x + scaledWidth, y + scaledHeight, x + scaledWidth - scaledRadius, y + scaledHeight);
+                    drawCtx.lineTo(x + scaledRadius, y + scaledHeight);
+                    drawCtx.quadraticCurveTo(x, y + scaledHeight, x, y + scaledHeight - scaledRadius);
+                    drawCtx.lineTo(x, y + scaledRadius);
+                    drawCtx.quadraticCurveTo(x, y, x + scaledRadius, y);
+                    drawCtx.closePath();
+                    drawCtx.stroke();
                 });
             }
 
-            function updateCanvases() {
-                drawPoints();
-                drawFixedBoxes();
-                requestAnimationFrame(updateCanvases);
-            }
-
-            // Rest of the code remains the same...
             map.on('resize', function () {
                 const size = map.getSize();
                 overlayCanvas.width = size.x;
@@ -170,15 +185,24 @@
                 for (const [name, latLng] of Object.entries(pointsData)) {
                     containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
                 }
+                drawPoints();
+                drawFixedBoxes()
             });
 
             map.whenReady(async function () {
+
                 await preloadImages();
+
                 map.fire('resize');
                 for (const [name, latLng] of Object.entries(pointsData)) {
                     containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
                 }
-                updateCanvases();
+
+                drawPoints();
+
+                setInterval(() => {
+                    map.fire('resize');
+                }, 2000);
             });
 
             function handleEvent(eventName, e) {
@@ -206,6 +230,9 @@
                             } else if (eventName === 'pointerup' || eventName === 'touchend') {
                                 isDragging = false;
                             }
+
+                            drawPoints();
+                            drawFixedBoxes()
                         }
                     }
                 } catch (error) {
@@ -213,35 +240,72 @@
                 }
             }
 
-            overlayCanvas.addEventListener('pointerdown', function(e) { handleEvent('pointerdown', e); map.dragging.enable(); });
-            overlayCanvas.addEventListener('pointerup', function(e) { handleEvent('pointerup', e); map.dragging.disable(); });
-            overlayCanvas.addEventListener('touchmove', function(e) { if (e.touches.length === 1) { handleEvent('touchmove', e); } });
-            overlayCanvas.addEventListener('mouseleave', function() { map.dragging.disable(); });
-            overlayCanvas.addEventListener('mousedown', function(e) { handleEvent('movestart', e); map.dragging.enable(); });
-            overlayCanvas.addEventListener('mouseup', function(e) { handleEvent('moveend', e); map.dragging.disable(); });
+            overlayCanvas.addEventListener('pointerdown', function (e) { handleEvent('pointerdown', e); map.dragging.enable(); });
+            overlayCanvas.addEventListener('pointerup', function (e) { handleEvent('pointerup', e); map.dragging.disable(); });
+            overlayCanvas.addEventListener('touchmove', function (e) { if (e.touches.length === 1) { handleEvent('touchmove', e); } });
+            overlayCanvas.addEventListener('mouseleave', function () { map.dragging.disable(); });
+            overlayCanvas.addEventListener('mousedown', function (e) { handleEvent('movestart', e); map.dragging.enable(); });
+            overlayCanvas.addEventListener('mouseup', function (e) { handleEvent('moveend', e); map.dragging.disable(); });
 
-            map.on('drag', function(e) { handleEvent('drag', e); });
-            map.on('zoomend', function() {
+            map.on('drag', function (e) { handleEvent('drag', e); });
+
+            map.on('zoomend', function (e) {
                 for (const [name, latLng] of Object.entries(pointsData)) {
                     containerPoints[latLng.img] = map.latLngToContainerPoint(latLng);
                 }
+                drawPoints();
+                drawFixedBoxes()
             });
 
             map.dragging.disable();
 
             function updateOpacity(value) {
                 opacityValue = parseFloat(value);
+                drawPoints();
             }
             window.updateOpacity = updateOpacity;
-
-            document.getElementById('changeTileProvider').addEventListener('click', function() {
+                        
+            document.getElementById('changeTileProvider').addEventListener('click', function () {
                 currentTileProvider = (currentTileProvider + 1) % tileProviders.length;
                 map.removeLayer(tileLayer);
                 tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
             });
+            
+            drawCanvas.addEventListener('touchstart', function(e) { 
+                // add drag logic in if logic
+            });
+
+            drawCanvas.addEventListener('touchmove', function(e) {
+                // add drag logic in if logic
+                if (e.touches.length === 1) {
+                    map.dragging.enable();
+                    handleEvent('touchmove', e);
+                }
+            });
+
+            drawCanvas.addEventListener('touchend', function(e) {
+                // add drag logic in if logic
+            });
+
+            drawCanvas.addEventListener('mousedown', function (e) {
+                // add drag logic in if logic
+                map.dragging.enable();
+                handleEvent('movestart', e);
+            });
+
+            drawCanvas.addEventListener('mousemove', function (e) {
+                // add drag logic in if logic
+            });
+
+            drawCanvas.addEventListener('mouseup', function (e) {
+                // add drag logic in if logic
+                handleEvent('moveend', e);
+            });
+
         }
 
         document.addEventListener('DOMContentLoaded', main);
+
     </script>
 </body>
 </html>

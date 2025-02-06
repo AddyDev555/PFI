@@ -10,17 +10,21 @@
 </head>
 
 <body>
+
     <div id="map" data-tap-disabled="true">
         <canvas id="overlayCanvas"></canvas>
         <canvas id="drawCanvas"></canvas>
     </div>
-    <div class="opacitySlider">
-    <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="0" oninput="window.updateOpacity(this.value)" />
-            <p id="opacityValue">Scroll for Hint's: 0</p>
+
+    <div class="opacitySlider" style="position: absolute; top: 20px; right: 0px; z-index: 1000;">
+        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1" oninput="window.updateOpacity(this.value)" />
     </div>
+
     <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile Provider</button>
     <button id="toggleDraw" style="position: absolute; bottom: 50px; right: 10px; z-index: 1000;">Enable Drawing</button>
     <button id="compareDraw" style="position: absolute; bottom: 90px; right: 10px; z-index: 1000;">Compare Area</button>
+    <button id="pause" style="position: absolute; bottom: 130px; right: 10px; z-index: 1000;">Pause</button>
+    <button id="undo" style="position: absolute; bottom: 170px; right: 10px; z-index: 1000;">Undo</button>
 
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script>
@@ -39,28 +43,33 @@
         let geoStrokes = []; 
         let currentGeoStroke = null;
 
+        let isPaused = false;
 
         const tileProviders = [
             'http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
-            'http://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}',
-            'http://services.arcgisonline.com/arcgis/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}',
-            'http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            'http://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}'
         ];
         let currentTileProvider = 0;
 
         var mapOptions = {
             center: [19.0760, 72.8777],
             zoom: 4,
-            zoomControl: false,
+            zoomControl: true,
             tap: false,
-            touchZoom: true,
             scrollWheelZoom: true,
             doubleClickZoom: false,
             minZoom: 4,
             maxZoom: 11,
-            attributionControl: false
+            attributionControl: false,
+            touchZoom: false,
+            dragging: true  
         };
+
+        const overlayCanvas = document.getElementById('overlayCanvas');
+        const ctx = overlayCanvas.getContext('2d');
+
+        const drawCanvas = document.getElementById('drawCanvas');
+        const drawCtx = drawCanvas.getContext('2d');
 
         const pointsData = [
             {
@@ -70,6 +79,11 @@
             },
             {
                 "img": "mapHM.png",
+                "lat": 24.351399328153236,
+                "lng": 81.9337890625
+            },
+            {
+                "img": "mapRR.png",
                 "lat": 24.351399328153236,
                 "lng": 81.9337890625
             },
@@ -98,12 +112,6 @@
             const map = L.map('map', mapOptions);
 
             let tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
-
-            const overlayCanvas = document.getElementById('overlayCanvas');
-            const ctx = overlayCanvas.getContext('2d');
-
-            const drawCanvas = document.getElementById('drawCanvas');
-            const drawCtx = drawCanvas.getContext('2d');
 
             function drawPoints() {
                 if (!ctx) return;
@@ -230,6 +238,8 @@
             document.getElementById('toggleDraw').addEventListener('click', function () {
                 drawingEnabled = !drawingEnabled;
 
+                document.body.style.cursor = (document.body.style.cursor === "crosshair") ? "default" : "crosshair";
+
                 if (drawingEnabled) {
                     map.dragging.disable();
                     drawCanvas.style.zIndex = '402';
@@ -251,8 +261,75 @@
                 }
             });
 
+            document.getElementById('undo').addEventListener('click', function () {
+                if (drawingEnabled && geoStrokes.length > 0) {
+                    geoStrokes.pop(); 
+                    redrawStrokes();  
+                }
+            });
+
+            document.getElementById('pause').addEventListener('click', function () {
+                isPaused = !isPaused;
+                this.innerText = isPaused ? "Resume" : "Pause";
+            });
+
+            drawCanvas.addEventListener('touchstart', function(e) { 
+                if (e.touches.length === 1 && !isPaused) {
+                    map.dragging.disable();
+                    if (!drawingEnabled) return;
+                    
+                    isDrawing = true;
+                    
+                    const rect = drawCanvas.getBoundingClientRect();
+                    const x = e.touches[0].clientX - rect.left;
+                    const y = e.touches[0].clientY - rect.top;
+                    
+                    const geoPoint = screenToGeo(x, y, map);
+                    currentGeoStroke = {
+                        points: [{
+                            screen: { x, y },
+                            geo: { lat: geoPoint.lat, lng: geoPoint.lng }
+                        }]
+                    };
+                    
+                    drawCtx.beginPath();
+                    drawCtx.moveTo(x, y);
+                }
+            });
+
+            drawCanvas.addEventListener('touchmove', function(e) {
+                if (e.touches.length === 1 && isDrawing && !isPaused) {
+                    const rect = drawCanvas.getBoundingClientRect();
+                    const x = e.touches[0].clientX - rect.left;
+                    const y = e.touches[0].clientY - rect.top;
+                    
+                    const geoPoint = screenToGeo(x, y, map);
+                    currentGeoStroke.points.push({
+                        screen: { x, y },
+                        geo: { lat: geoPoint.lat, lng: geoPoint.lng }
+                    });
+                    
+                    drawCtx.lineTo(x, y);
+                    drawCtx.strokeStyle = 'red';
+                    drawCtx.lineWidth = getStrokeWidth(map);
+                    drawCtx.stroke();
+                } else if (e.touches.length === 1 && isPaused) {
+                    map.dragging.enable();
+                    handleEvent('touchmove', e);
+                }
+            });
+
+            drawCanvas.addEventListener('touchend', function(e) {
+                if (isDrawing && !isPaused) {
+                    geoStrokes.push(currentGeoStroke);
+                    currentGeoStroke = null;
+                    isDrawing = false;
+                }
+            });
+
             drawCanvas.addEventListener('mousedown', function (e) {
-                if (e.buttons == 1) {
+                if (e.buttons == 1  && !isPaused) {
+                    map.dragging.disable();
                     if (!drawingEnabled) return;
                     isDrawing = true;
                     const geoPoint = screenToGeo(e.offsetX, e.offsetY, map);
@@ -264,6 +341,12 @@
                     };
                     drawCtx.beginPath();
                     drawCtx.moveTo(e.offsetX, e.offsetY);
+                } else if (e.buttons == 1  && isPaused) {
+                    map.dragging.enable();
+                    handleEvent('movestart', e);
+                } else if (e.buttons == 4) {
+                    map.dragging.enable();
+                    handleEvent('movestart', e);
                 }
             });
 
@@ -281,31 +364,36 @@
                 }
             });
 
-            drawCanvas.addEventListener('mouseup', function () {
+            drawCanvas.addEventListener('mouseup', function (e) {
                 if (isDrawing) {
                     geoStrokes.push(currentGeoStroke);
                     currentGeoStroke = null;
                     isDrawing = false;
+                } else {
+                    handleEvent('moveend', e);
                 }
             });
 
-            document.getElementById('compareDraw').addEventListener('click', function () {
-                redrawStrokes();
+            document.getElementById('compareDraw').addEventListener('click', function () {     
+                if (!drawingEnabled) return;            
+                redrawStrokes(); 
 
                 const drawData = drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
                 const overlayData = ctx.getImageData(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-                let drawPixels = 0, overlayPixels = 0;
+                let drawPixels = 0, overlayPixels = 0, overlapPixels = 0;
 
                 for (let i = 0; i < drawData.data.length; i += 4) {
                     const isDrawn = drawData.data[i + 3] > 0;
                     const isOverlay = overlayData.data[i + 3] > 0;
+
                     if (isDrawn) drawPixels++;
                     if (isOverlay) overlayPixels++;
+                    if (isDrawn && isOverlay) overlapPixels++;  
                 }
 
-                const ratio = overlayPixels ? (drawPixels / overlayPixels).toFixed(2) : 0;
-                alert(`Drawn Area / Image Area Ratio: ${ratio}`);
+                const overlapRatio = overlayPixels ? (overlapPixels / overlayPixels).toFixed(2) : 0;
+                alert(`Success Rate: ${overlapRatio}`);
             });
 
             function screenToGeo(x, y, map) {
