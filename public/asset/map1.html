@@ -268,8 +268,7 @@
                 this.innerText = isPaused ? "Resume" : "Pause";
             });
 
-            drawCanvas.addEventListener('touchstart', function(e) {
-                e.preventDefault(); 
+            drawCanvas.addEventListener('touchstart', function(e) { 
                 if (e.touches.length === 1 && !isPaused) {
                     map.dragging.disable();
                     if (!drawingEnabled) return;
@@ -294,7 +293,6 @@
             });
 
             drawCanvas.addEventListener('touchmove', function(e) {
-                e.preventDefault(); 
                 if (e.touches.length === 1 && isDrawing && !isPaused) {
                     const rect = drawCanvas.getBoundingClientRect();
                     const x = e.touches[0].clientX - rect.left;
@@ -317,7 +315,6 @@
             });
 
             drawCanvas.addEventListener('touchend', function(e) {
-                e.preventDefault();
                 if (isDrawing && !isPaused) {
                     geoStrokes.push(currentGeoStroke);
                     currentGeoStroke = null;
@@ -372,23 +369,26 @@
                 }
             });
 
-            document.getElementById('compareDraw').addEventListener('click', function () {
-                redrawStrokes();
+            document.getElementById('compareDraw').addEventListener('click', function () {     
+                if (!drawingEnabled) return;            
+                redrawStrokes(); 
 
                 const drawData = drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
                 const overlayData = ctx.getImageData(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-                let drawPixels = 0, overlayPixels = 0;
+                let drawPixels = 0, overlayPixels = 0, overlapPixels = 0;
 
                 for (let i = 0; i < drawData.data.length; i += 4) {
                     const isDrawn = drawData.data[i + 3] > 0;
                     const isOverlay = overlayData.data[i + 3] > 0;
+
                     if (isDrawn) drawPixels++;
                     if (isOverlay) overlayPixels++;
+                    if (isDrawn && isOverlay) overlapPixels++;  
                 }
 
-                const ratio = overlayPixels ? (drawPixels / overlayPixels).toFixed(2) : 0;
-                alert(`Drawn Area / Image Area Ratio: ${ratio}`);
+                const overlapRatio = overlayPixels ? (overlapPixels / overlayPixels).toFixed(2) : 0;
+                alert(`Overlap Area / Image Area Ratio: ${overlapRatio}`);
             });
 
             function screenToGeo(x, y, map) {
