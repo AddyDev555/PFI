@@ -16,8 +16,8 @@
         <canvas id="drawCanvas"></canvas>
     </div>
 
-    <div class="opacitySlider">
-    <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1" oninput="window.updateOpacity(this.value)" />
+    <div class="opacitySlider" style="position: absolute; top: 20px; right: 0px; z-index: 1000;">
+        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1" oninput="window.updateOpacity(this.value)" />
     </div>
 
     <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile Provider</button>
@@ -79,6 +79,11 @@
             },
             {
                 "img": "mapHM.png",
+                "lat": 24.351399328153236,
+                "lng": 81.9337890625
+            },
+            {
+                "img": "mapRR.png",
                 "lat": 24.351399328153236,
                 "lng": 81.9337890625
             },
@@ -388,7 +393,6 @@
                 }
 
                 const overlapRatio = overlayPixels ? (overlapPixels / overlayPixels).toFixed(2) : 0;
-                alert(`Overlap Area / Image Area Ratio: ${overlapRatio}`);
                 alert(`Success Rate: ${overlapRatio}`);
             });
 
