@@ -6,7 +6,6 @@ import DADmap from './DADmap';
 export default function Home() {
     const [color, setColor] = useState("");
     const [DAD, setDAD] = useState("");
-    var render = false;
 
     function handleColorClick(paintColor) {
         setColor(paintColor);
@@ -44,7 +43,6 @@ export default function Home() {
     return (
         <main>
             <div className="simulationCon">
-                { render && (
                 <div className="instructionCon">
                     <h1>Instructions</h1>
                     <hr />
@@ -103,7 +101,6 @@ export default function Home() {
                         <h2>Score: </h2>
                     </div>
                 </div>
-                )}
 
                 <div className="mainCon">
                     {DAD === "DAD" && <DADmap />}
