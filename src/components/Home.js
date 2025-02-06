@@ -10,7 +10,7 @@ export default function Home() {
     function handleColorClick(paintColor) {
         setColor(paintColor);
     }
-    
+
     function submitAns() {
         const containers = {
             draw: document.querySelector(".himalayas_drawCon"),
@@ -18,33 +18,58 @@ export default function Home() {
             dragAndDrop: document.querySelector(".himalayasDragAndDropCon"),
             dadResult: document.querySelector(".himalayasDADResult")
         };
-    
+
         if (!Object.values(containers).every(container => container)) {
             console.error("One or more containers not found");
             return;
         }
-    
-        if (containers.drawResult.style.display === "" || 
+
+        if (containers.drawResult.style.display === "" ||
             containers.drawResult.style.display === "none") {
             containers.draw.style.display = "none";
             containers.drawResult.style.display = "block";
-    
+
         } else if (containers.drawResult.style.display === "block") {
             containers.drawResult.style.display = "none";
             containers.dragAndDrop.style.display = "block";
             setDAD("DAD");
-    
+
         } else if (containers.dragAndDrop.style.display === "block") {
             containers.dragAndDrop.style.display = "none";
             containers.dadResult.style.display = "block";
         }
     }
 
+    function toggleInsContainer(){
+        let leftArrow = document.querySelector(".leftArrow");
+        let rightArrow = document.querySelector(".rightArrow");
+        let instructionCon = document.querySelector(".instructionCon");
+
+        if(leftArrow.classList.contains("fi-rr-angle-small-left")){
+            instructionCon.style.transform = "translateX(-500px)";
+            instructionCon.style.transition = "all 0.3s ease-in-out"; 
+            rightArrow.style.display = "block";
+            leftArrow.classList.remove("fi-rr-angle-small-left");
+            rightArrow.classList.add("fi-rr-angle-small-right");
+        }
+        else if(rightArrow.classList.contains("fi-rr-angle-small-right")){
+            instructionCon.style.transform = "translateX(0px)";
+            instructionCon.style.transition = "all 0.3s ease-in-out"; 
+            rightArrow.style.display = "none";
+            rightArrow.classList.remove("fi-rr-angle-small-right");
+            leftArrow.classList.add("fi-rr-angle-small-left");
+        }
+    }
+
     return (
         <main>
             <div className="simulationCon">
+                <i onClick={toggleInsContainer} class="fi fi-rr-angle-small-right rightArrow"></i>
                 <div className="instructionCon">
-                    <h1>Instructions</h1>
+                    <div className="insHeader">
+                        <h1>Instructions</h1>
+                        <i onClick={toggleInsContainer} class="fi fi-rr-angle-small-left leftArrow"></i>
+                    </div>
                     <hr />
                     <div className="himalayas_drawCon">
                         <h2>Himalayan Ranges</h2>
@@ -83,14 +108,13 @@ export default function Home() {
                     <div className="himalayasDragAndDropCon">
                         <h2>Himalayan Ranges</h2>
                         <span className='activityHeader'>Activity 2: Drag and Drop</span>
-                        <ul>
-                            <li><i className="fi fi-bs-mountain mount"></i>Range1</li>
-                            <li><i className="fi fi-bs-mountain mount"></i>Range2</li>
-                            <li><i className="fi fi-bs-mountain mount"></i>Range3</li>
-                            <li><i className="fi fi-bs-mountain mount"></i>Range4</li>
-                            <li><i className="fi fi-bs-mountain mount"></i>Range5</li>
-                            <li><i className="fi fi-bs-mountain mount"></i>Range6</li>
-                        </ul>
+                        <p className="instructions">
+                            Drag the names of the Himalayan ranges to their correct locations on the map.
+                            The Himalayas are divided into three major ranges: the Great Himalayas, the Lesser Himalayas, and the Shivalik Hills.
+                            Carefully place each range in the correct position to test your knowledge of their geography.
+                            Once you've arranged them, click the "Submit" button to check your answers!
+                        </p>
+
                         <button onClick={submitAns} className='submitBtn'>Submit</button>
                     </div>
 

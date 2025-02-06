@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,13 +17,16 @@
     </div>
 
     <div class="opacitySlider" style="position: absolute; top: 20px; right: 0px; z-index: 1000;">
-        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1" oninput="window.updateOpacity(this.value)" />
+        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1"
+            oninput="window.updateOpacity(this.value)" />
     </div>
-    <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile Provider</button>
+    
+    <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile
+        Provider</button>
 
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script>
-   
+
         let containerPoints = {};
         const imageCache = {};
         let startX = 0;
@@ -157,10 +161,10 @@
                     const scaledWidth = box.width * scaleFactor;
                     const scaledHeight = box.height * scaleFactor;
                     const scaledRadius = 5 * scaleFactor;
-                    
-                    const x = point.x - scaledWidth/2;
-                    const y = point.y - scaledHeight/2;
-                    
+
+                    const x = point.x - scaledWidth / 2;
+                    const y = point.y - scaledHeight / 2;
+
                     drawCtx.beginPath();
                     drawCtx.moveTo(x + scaledRadius, y);
                     drawCtx.lineTo(x + scaledWidth - scaledRadius, y);
@@ -264,18 +268,18 @@
                 drawPoints();
             }
             window.updateOpacity = updateOpacity;
-                        
+
             document.getElementById('changeTileProvider').addEventListener('click', function () {
                 currentTileProvider = (currentTileProvider + 1) % tileProviders.length;
                 map.removeLayer(tileLayer);
                 tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
             });
-            
-            drawCanvas.addEventListener('touchstart', function(e) { 
+
+            drawCanvas.addEventListener('touchstart', function (e) {
                 // add drag logic in if logic
             });
 
-            drawCanvas.addEventListener('touchmove', function(e) {
+            drawCanvas.addEventListener('touchmove', function (e) {
                 // add drag logic in if logic
                 if (e.touches.length === 1) {
                     map.dragging.enable();
@@ -283,7 +287,7 @@
                 }
             });
 
-            drawCanvas.addEventListener('touchend', function(e) {
+            drawCanvas.addEventListener('touchend', function (e) {
                 // add drag logic in if logic
             });
 
@@ -308,4 +312,5 @@
 
     </script>
 </body>
+
 </html>

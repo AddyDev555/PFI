@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap');
 @import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-straight/css/uicons-bold-straight.css');
+@import url('https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css');
+
 
 .paint-active {
     cursor: crosshair;
@@ -49,8 +51,9 @@
     font-size: 1.2rem;
     color: black;
     width: 58%;
-    margin: auto;
     margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
     font-family: "Roboto Slab", serif;
 }
 
@@ -206,4 +209,28 @@ hr{
 .mount{
     margin-right: 5px;
     color: darkcyan;
+}
+
+.instructions{
+    font-size: 0.8rem;
+}
+
+.insHeader{
+    display: flex;
+    align-items: center;
+    align-content: center;
+}
+
+.leftArrow{
+    position: relative;
+    top: 3px;
+    left: 40px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.rightArrow{
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: none;
 }

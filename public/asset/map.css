@@ -56,3 +56,15 @@ html, body {
   position: relative;
   right: 30px;
 }
+
+.DADRangesCanvas{
+  position: fixed;
+  top: 15%;
+  right: 10px;
+  width: 15%;
+  height: 60vh;
+  background-color: rgba(0,0,0,0.5);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  border-radius: 10px;
+}
