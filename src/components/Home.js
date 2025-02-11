@@ -60,11 +60,11 @@ export default function Home() {
     return (
         <main>
             <div className="simulationCon">
-                <i onClick={toggleInsContainer} class="fi fi-rr-angle-small-right rightArrow"></i>
+                <i onClick={toggleInsContainer} className="fi fi-rr-angle-small-right rightArrow"></i>
                 <div className="instructionCon">
                     <div className="insHeader">
                         <h1>Instructions</h1>
-                        <i onClick={toggleInsContainer} class="fi fi-rr-angle-small-left leftArrow"></i>
+                        <i onClick={toggleInsContainer} className="fi fi-rr-angle-small-left leftArrow"></i>
                     </div>
                     <hr />
                     <div className="himalayas_drawCon">

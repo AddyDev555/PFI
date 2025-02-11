@@ -12,97 +12,14 @@
 <body>
 
     <div id="map" data-tap-disabled="true">
-        <canvas id="overlayCanvas"></canvas>
-        <canvas id="drawCanvas"></canvas>
     </div>
-
-    <div class="opacitySlider" style="position: absolute; top: 20px; right: 0px; z-index: 1000;">
-        <input id="opacityRange" type="range" min="0" max="1" step="0.1" value="1"
-            oninput="window.updateOpacity(this.value)" />
-    </div>
-
-    <div class="DADRangesCanvas">
-        <canvas id="DADCanvas"></canvas>
-    </div>
-
-    <button id="changeTileProvider" style="position: absolute; bottom: 10px; right: 10px; z-index: 1000;">Change Tile
-        Provider</button>
+    
+    <img id="changeTileProvider" src="/btns/exchange.png" 
+    style="position: absolute; bottom: 15px; right: 15px; z-index: 1000; cursor: pointer; width: 28px; height: 28px;" />
 
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
-
+    <script src="polygon.js"></script>
     <script>
-        const canvas = document.getElementById("DADCanvas");
-        const ctx = canvas.getContext("2d");
-
-        const textObjects = [
-        { id: "title1", text: "Himalayan Ranges", x: 21, y: 20, font: "13px Arial", color: "black" },
-        { id: "title2", text: " Drag and Drop Activity", x: 23, y: 40, font: "10px Arial", color: "black" },
-    ];
-
-    const fixedBoxes2 = [
-            { lat: 29.9668322, lng: 70.6887817, width: 60, height: 20, id: "Sulaiman Range" },
-            { lat: 24.9412382, lng: 74.4969177, width: 60, height: 20, id: "Aravali Range" },
-            { lat: 21.6223244, lng: 71.2545776, width: 60, height: 20, id: "Gir Range" },
-            { lat: 22.5468059, lng: 77.2531127, width: 60, height: 20, id: "Vindhya Range" },
-            { lat: 21.3712443, lng: 76.2231445, width: 60, height: 20, id: "Satpura Range" },
-            { lat: 21.2816967, lng: 80.4144287, width: 60, height: 20, id: "Mahadeo Hills" },
-            { lat: 16.5154201, lng: 73.9764502, width: 60, height: 20, id: "Western Ghats" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Eastern Ghats" },
-            { lat: 25.0059726, lng: 91.4941406, width: 60, height: 20, id: "Garo Khasi Jaintia" },
-            { lat: 23.3674713, lng: 93.0651855, width: 60, height: 20, id: "Mizo Hills" },
-            { lat: 25.7998911, lng: 95.6250000, width: 60, height: 20, id: "Naga Hills" },
-            { lat: 27.4302897, lng: 97.7014160, width: 60, height: 20, id: "Patkai Bum" },
-            { lat: 36.8092847, lng: 70.7958984, width: 60, height: 20, id: "Hindu Kush" },
-            { lat: 38.5695599, lng: 74.4816792, width: 60, height: 20, id: "Pamir Knot" },
-            { lat: 37.1953305, lng: 79.8706054, width: 60, height: 20, id: "Kunlun Mt.s" },
-            { lat: 30.1831218, lng: 77.4316406, width: 60, height: 20, id: "Shiwalik Range" },
-            { lat: 33.8704155, lng: 76.7944335, width: 60, height: 20, id: "Zaskar Range" },
-            { lat: 35.2276723, lng: 75.8825683, width: 60, height: 20, id: "Ladakh Range" },
-            { lat: 31.4755240, lng: 81.1230468, width: 60, height: 20, id: "Kailash Range" },
-            { lat: 36.0135605, lng: 76.4648437, width: 60, height: 20, id: "Karakoram Range" },
-            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Greater Himalaya" },
-            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Middle Himalaya" },
-            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Dafla Hills" }
-        ];
-
-    fixedBoxes2.forEach((box, index) => {
-        textObjects.push({
-            id: box.id,
-            text: box.id,
-            x: 23,
-            y: 70 + index * 30,
-            font: "15px Arial",
-            color: "gray"
-        });
-    });
-
-    canvas.height = Math.max(textObjects.length * 30 + 100, 500);
-
-    function drawTexts() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-        textObjects.forEach(obj => {
-            ctx.font = obj.font;
-            ctx.fillStyle = obj.color;
-            ctx.fillText(obj.text, obj.x, obj.y);
-        });
-    }
-
-    drawTexts();
-
-    </script>
-
-    <script>
-
-        let baseWidth = 376.80;
-        let baseHeight = 391.20;
-
-        let containerPoint = {};
-        const imageCache = {};
-        let startX = 0;
-        let startY = 0;
-        let isDragging = false;
-        let opacityValue = 1;
 
         const tileProviders = [
             'http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
@@ -123,252 +40,28 @@
             attributionControl: false
         };
 
-        const pointsData_def = [
-            { "img": "mapAR.png" },
-            { "img": "mnt/anai mudi.png" },
-            { "img": "mnt/anna purna.png" },
-            { "img": "mnt/dhaula giri.png" },
-            { "img": "mnt/gurla mandhata.png" },
-            { "img": "mnt/k2.png" },
-            { "img": "mnt/kamet.png" },
-            { "img": "mnt/kanchenjunga.png" },
-            { "img": "mnt/mahendragiri.png" },
-            { "img": "mnt/makalu.png" },
-            { "img": "mnt/mt. everest.png" },
-            { "img": "mnt/namcha barwa.png" },
-            { "img": "mnt/nanda devi.png" },
-            { "img": "mnt/nanga parbat.png" },
-            { "img": "mnt/rakaposhi.png" }
-        ];
-
-        let commonLatLng = { "lat": 24.351399328153236, "lng": 81.9337890625 };
-
-        const fixedBoxes = [
-            { lat: 29.9668322, lng: 70.6887817, width: 60, height: 20, id: "Sulaiman Range" },
-            { lat: 24.9412382, lng: 74.4969177, width: 60, height: 20, id: "Aravali Range" },
-            { lat: 21.6223244, lng: 71.2545776, width: 60, height: 20, id: "Gir Range" },
-            { lat: 22.5468059, lng: 77.2531127, width: 60, height: 20, id: "Vindhya Range" },
-            { lat: 21.3712443, lng: 76.2231445, width: 60, height: 20, id: "Satpura Range" },
-            { lat: 21.2816967, lng: 80.4144287, width: 60, height: 20, id: "Mahadeo Hills" },
-            { lat: 16.5154201, lng: 73.9764502, width: 60, height: 20, id: "Western Ghats" },
-            { lat: 17.6021391, lng: 80.3320312, width: 60, height: 20, id: "Eastern Ghats" },
-            { lat: 25.0059726, lng: 91.4941406, width: 60, height: 20, id: "Garo Khasi Jaintia" },
-            { lat: 23.3674713, lng: 93.0651855, width: 60, height: 20, id: "Mizo Hills" },
-            { lat: 25.7998911, lng: 95.6250000, width: 60, height: 20, id: "Naga Hills" },
-            { lat: 27.4302897, lng: 97.7014160, width: 60, height: 20, id: "Patkai Bum" },
-            { lat: 36.8092847, lng: 70.7958984, width: 60, height: 20, id: "Hindu Kush" },
-            { lat: 38.5695599, lng: 74.4816792, width: 60, height: 20, id: "Pamir Knot" },
-            { lat: 37.1953305, lng: 79.8706054, width: 60, height: 20, id: "Kunlun Mt.s" },
-            { lat: 30.1831218, lng: 77.4316406, width: 60, height: 20, id: "Shiwalik Range" },
-            { lat: 33.8704155, lng: 76.7944335, width: 60, height: 20, id: "Zaskar Range" },
-            { lat: 35.2276723, lng: 75.8825683, width: 60, height: 20, id: "Ladakh Range" },
-            { lat: 31.4755240, lng: 81.1230468, width: 60, height: 20, id: "Kailash Range" },
-            { lat: 36.0135605, lng: 76.4648437, width: 60, height: 20, id: "Karakoram Range" },
-            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Greater Himalaya" },
-            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Middle Himalaya" },
-            { lat: 29.8788198, lng: 80.8372700, width: 60, height: 20, id: "Dafla Hills" }
-        ];
-
-        function preloadImages() {
-            const preloadPromises = pointsData_def.map((point) => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.src = point.img;
-                    imageCache[point.img] = img;
-                    img.onload = resolve;
-                });
-            });
-            return Promise.all(preloadPromises);
-        }
-
         function main() {
             const map = L.map('map', mapOptions);
             let tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
 
-            const overlayCanvas = document.getElementById('overlayCanvas');
-            const ctx = overlayCanvas.getContext('2d');
-
-            const drawCanvas = document.getElementById('drawCanvas');
-            const drawCtx = drawCanvas.getContext('2d');
-
-            drawCanvas.style.zIndex = '402';
-
-            function drawPoints() {
-                if (!ctx) return;
-                ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-
-                ctx.globalAlpha = opacityValue;
-
-                requestAnimationFrame(() => {
-                    ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-                    const zoomLevel = map.getZoom();
-                    const scaleFactor = Math.pow(2, zoomLevel - mapOptions.minZoom);
-
-                    pointsData_def.forEach(point => {
-                        const img = imageCache[point.img];
-                        if (img && img.complete) {
-                            const imgWidth = baseWidth * scaleFactor;
-                            const imgHeight = baseHeight * scaleFactor;
-
-                            ctx.drawImage(img, containerPoint.x - imgWidth / 2, containerPoint.y - imgHeight / 2, imgWidth, imgHeight);
-                        }
-                    });
-                });
-            }
-
-            function drawFixedBoxes() {
-                drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
-                drawCtx.strokeStyle = 'black';
-                drawCtx.lineWidth = 2;
-
-                const zoomLevel = map.getZoom();
-                const scaleFactor = Math.pow(1.35, zoomLevel - mapOptions.minZoom);
-
-                fixedBoxes.forEach(box => {
-                    const point = map.latLngToContainerPoint([box.lat, box.lng]);
-                    const scaledWidth = box.width * scaleFactor;
-                    const scaledHeight = box.height * scaleFactor;
-                    const scaledRadius = 5 * scaleFactor;
-
-                    const x = point.x - scaledWidth / 2;
-                    const y = point.y - scaledHeight / 2;
-
-                    drawCtx.beginPath();
-                    drawCtx.moveTo(x + scaledRadius, y);
-                    drawCtx.lineTo(x + scaledWidth - scaledRadius, y);
-                    drawCtx.quadraticCurveTo(x + scaledWidth, y, x + scaledWidth, y + scaledRadius);
-                    drawCtx.lineTo(x + scaledWidth, y + scaledHeight - scaledRadius);
-                    drawCtx.quadraticCurveTo(x + scaledWidth, y + scaledHeight, x + scaledWidth - scaledRadius, y + scaledHeight);
-                    drawCtx.lineTo(x + scaledRadius, y + scaledHeight);
-                    drawCtx.quadraticCurveTo(x, y + scaledHeight, x, y + scaledHeight - scaledRadius);
-                    drawCtx.lineTo(x, y + scaledRadius);
-                    drawCtx.quadraticCurveTo(x, y, x + scaledRadius, y);
-                    drawCtx.closePath();
-                    drawCtx.stroke();
-                });
-            }
-
-            map.on('resize', function () {
-                const size = map.getSize();
-                overlayCanvas.width = size.x;
-                overlayCanvas.height = size.y;
-                drawCanvas.width = size.x;
-                drawCanvas.height = size.y;
-
-                containerPoint = map.latLngToContainerPoint([commonLatLng.lat, commonLatLng.lng]);
-
-                drawPoints();
-                drawFixedBoxes()
-            });
-
             map.whenReady(async function () {
 
-                await preloadImages();
+            polygons.forEach(polygon => {
+                let poly = L.polygon(polygon.coords, {
+                    color: 'blue',       
+                    fillColor: 'lightblue', 
+                    fillOpacity: 0.5
+                }).addTo(map);
 
-                map.fire('resize');
-
-                containerPoint = map.latLngToContainerPoint([commonLatLng.lat, commonLatLng.lng]);
-
-                drawPoints();
-
-                setInterval(() => {
-                    map.fire('resize');
-                }, 2000);
+                poly.bindPopup(`<b>${polygon.text}</b>`); 
             });
 
-            function handleEvent(eventName, e) {
-                try {
-                    if (e && (e.originalEvent?.type || e.type)) {
-                        const clientX = e.originalEvent?.clientX || e.clientX || e.changedTouches?.[0]?.clientX;
-                        const clientY = e.originalEvent?.clientY || e.clientY || e.changedTouches?.[0]?.clientY;
-
-                        if (clientX !== undefined && clientY !== undefined) {
-                            if (eventName === 'movestart' || eventName === 'pointerdown') {
-                                startX = clientX;
-                                startY = clientY;
-                                isDragging = true;
-                            } else if ((eventName === 'drag' || eventName === 'touchmove') && isDragging) {
-                                const dragDeltaX = clientX - startX;
-                                const dragDeltaY = clientY - startY;
-
-                                containerPoint.x += dragDeltaX;
-                                containerPoint.y += dragDeltaY;
-
-                                startX = clientX;
-                                startY = clientY;
-                            } else if (eventName === 'pointerup' || eventName === 'touchend') {
-                                isDragging = false;
-                            }
-
-                            drawPoints();
-                            drawFixedBoxes()
-                        }
-                    }
-                } catch (error) {
-                    console.error('Logging error:', error);
-                }
-            }
-
-            overlayCanvas.addEventListener('pointerdown', function (e) { handleEvent('pointerdown', e); map.dragging.enable(); });
-            overlayCanvas.addEventListener('pointerup', function (e) { handleEvent('pointerup', e); map.dragging.disable(); });
-            overlayCanvas.addEventListener('touchmove', function (e) { if (e.touches.length === 1) { handleEvent('touchmove', e); } });
-            overlayCanvas.addEventListener('mouseleave', function () { map.dragging.disable(); });
-            overlayCanvas.addEventListener('mousedown', function (e) { handleEvent('movestart', e); map.dragging.enable(); });
-            overlayCanvas.addEventListener('mouseup', function (e) { handleEvent('moveend', e); map.dragging.disable(); });
-
-            map.on('drag', function (e) { handleEvent('drag', e); });
-
-            map.on('zoomend', function (e) {
-
-                containerPoint = map.latLngToContainerPoint([commonLatLng.lat, commonLatLng.lng]);
-
-                drawPoints();
-                drawFixedBoxes()
             });
-
-            map.dragging.disable();
-
-            function updateOpacity(value) {
-                opacityValue = parseFloat(value);
-                drawPoints();
-            }
-            window.updateOpacity = updateOpacity;
 
             document.getElementById('changeTileProvider').addEventListener('click', function () {
                 currentTileProvider = (currentTileProvider + 1) % tileProviders.length;
                 map.removeLayer(tileLayer);
                 tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
-            });
-
-            drawCanvas.addEventListener('touchstart', function (e) {
-                // add drag logic in if logic
-            });
-
-            drawCanvas.addEventListener('touchmove', function (e) {
-                // add drag logic in if logic
-                if (e.touches.length === 1) {
-                    map.dragging.enable();
-                    handleEvent('touchmove', e);
-                }
-            });
-
-            drawCanvas.addEventListener('touchend', function (e) {
-                // add drag logic in if logic
-            });
-
-            drawCanvas.addEventListener('mousedown', function (e) {
-                // add drag logic in if logic
-                map.dragging.enable();
-                handleEvent('movestart', e);
-            });
-
-            drawCanvas.addEventListener('mousemove', function (e) {
-                // add drag logic in if logic
-            });
-
-            drawCanvas.addEventListener('mouseup', function (e) {
-                // add drag logic in if logic
-                handleEvent('moveend', e);
             });
 
         }
