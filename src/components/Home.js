@@ -1,40 +1,12 @@
 import React, { useState } from 'react';
 import "./css/Home.css";
-import DAS from './DASmap';
+import DASmap from './DASmap';
 import DADmap from './DADmap';
+import HTImap from './HTImap';
 
 export default function Home() {
 
-    const [DAD, setDAD] = useState("");
-
-    function submitAns() {
-        const containers = {
-            draw: document.querySelector(".himalayas_drawCon"),
-            drawResult: document.querySelector(".himalayas_drawCon_Result"),
-            dragAndDrop: document.querySelector(".himalayasDragAndDropCon"),
-            dadResult: document.querySelector(".himalayasDADResult")
-        };
-
-        if (!Object.values(containers).every(container => container)) {
-            console.error("One or more containers not found");
-            return;
-        }
-
-        if (containers.drawResult.style.display === "" ||
-            containers.drawResult.style.display === "none") {
-            containers.draw.style.display = "none";
-            containers.drawResult.style.display = "block";
-
-        } else if (containers.drawResult.style.display === "block") {
-            containers.drawResult.style.display = "none";
-            containers.dragAndDrop.style.display = "block";
-            setDAD("DAD");
-
-        } else if (containers.dragAndDrop.style.display === "block") {
-            containers.dragAndDrop.style.display = "none";
-            containers.dadResult.style.display = "block";
-        }
-    }
+    const id = 1;
 
     function toggleInsContainer(){
         let leftArrow = document.querySelector(".leftArrow");
@@ -73,14 +45,14 @@ export default function Home() {
                         <p>Paint the Himalayan Mountain Ranges. To start painting select the pencil icon and drag the mouse on the appropriate regions.</p>
 
                         <p className="subTit">If the coloring is done, submit your answer.</p>
-                        <button onClick={submitAns} className='submitBtn'>Submit</button>
+                        <button /*onClick={}*/  className='submitBtn'>Submit</button>
                     </div>
 
                     <div className="himalayas_drawCon_Result">
                         <h2>Himalayan Ranges</h2>
                         <span className='activityHeader'>Activity 1: Coloring</span>
                         <p>Corrections and result of the drawn region</p>
-                        <button onClick={submitAns} className='submitBtn'>Next</button>
+                        <button /*onClick={}*/  className='submitBtn'>Next</button>
                     </div>
 
                     <div className="himalayasDragAndDropCon">
@@ -93,7 +65,7 @@ export default function Home() {
                             Once you've arranged them, click the "Submit" button to check your answers!
                         </p>
 
-                        <button onClick={submitAns} className='submitBtn'>Submit</button>
+                        <button /*onClick={}*/ className='submitBtn'>Submit</button>
                     </div>
 
                     <div className="himalayasDADResult">
@@ -105,8 +77,9 @@ export default function Home() {
                 </div>
 
                 <div className="mainCon">
-                    {DAD === "DAD" && <DADmap />}
-                    <DAS />
+                    {id === 1 && <DASmap />}
+                    {id === 2 && <DADmap />}
+                    {id === 3 && <HTImap />}
                 </div>
             </div>
         </main>

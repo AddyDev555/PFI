@@ -35,7 +35,7 @@ var polygons = [
             ]
           ], 
         text: "gir range",
-        description: ""
+        description: `The eastern edge of the Sulaiman range runs 450 km (280 miles) from the Gomal Pass in Pakistan's Khyber Pakhtunkhwa province to near the city of Jacobabad in Sindh province, and further stretches into south-west Punjab. In Afghanistan, the western edge of the range starts just beyond the northern Loya Paktia province where they meet the Koh-i-Baba range. South from there, they meet the Spin Ghar range northeast of Gardez in Paktia province, but towards west, the mountain range drops gradually in Kandahar southwest into Helmand and the Sistan Basin. The Sulaiman Range, and the high plateaus to the west of it, helps form a natural barrier against the humid winds that blow from the Indian Ocean, creating arid conditions across southern and central Afghanistan to the west and north. In contrast, the relatively flat and low-lying Indus delta is situated due east and south of the Sulaimans. Rivers that drain the Sulaimans include the Gomal River which flows eastward into the Indus River, and the Dori River and other small tributaries of the Arghandab River, which flow southwestward into the Helmand River.`
     },
     { 
         coords: [

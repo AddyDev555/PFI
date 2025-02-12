@@ -7,21 +7,6 @@
     <title>Maharashtra Map</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@latest/dist/leaflet.css" />
     <link rel="stylesheet" href="/asset/map.css" />
-    <style>
-        .leaflet-interactive {
-            outline: none !important;
-        }
-
-        .custom-tooltip {
-            background: white !important; 
-            border: 2px solid black !important;
-            border-radius: 10px !important; 
-            padding: 5px !important; 
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3) !important; 
-            width: 60px;
-            height: 20px
-        }
-    </style>
 </head>
 
 <body>
@@ -62,15 +47,16 @@
             map.whenReady(async function () {
 
             polygons.forEach(polygon => {
+
+                let formattedText = polygon.text.replace(/\b\w/g, char => char.toUpperCase()); 
+
                 let poly = L.polygon(polygon.coords, {
                     color: 'blue',       
                     fillColor: 'lightblue', 
                     fillOpacity: 0.5
                 }).addTo(map);
 
-                // poly.bindTooltip(`<b>{$datafromdragtext}</b>`, { 
-                //     className: 'custom-tooltip', permanent: false, direction: "top", sticky: true
-                // });
+                poly.bindTooltip(`<b>${formattedText}</b>`, { permanent: false, direction: "top", sticky: true });
             });
 
             });
