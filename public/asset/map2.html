@@ -64,6 +64,9 @@
     <img id="changeTileProvider" src="/btns/exchange.png" 
         style="position: absolute; bottom: 15px; right: 15px; z-index: 1000; cursor: pointer; width: 28px; height: 28px;" />
 
+    <img id="compareDraw" src="/btns/justice-scale.png" 
+        style="position: absolute; bottom: 60px; right: 15px; z-index: 1000; cursor: pointer; width: 31px; height: 31px;" />
+
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script src="polygon.js"></script>
     <script>
@@ -94,7 +97,8 @@
 
             map.whenReady(async function () {
                 polygons.forEach((polygon, index) => {
-                    let randomColor = `#${Math.floor(Math.random() * 16777215).toString(16)}`; 
+
+                    let randomColor = `#${Math.floor(Math.random() * 128 + 128).toString(16).padStart(2, '0')}${Math.floor(Math.random() * 128 + 128).toString(16).padStart(2, '0')}${Math.floor(Math.random() * 128 + 128).toString(16).padStart(2, '0')}`;
                     
                     let poly = L.polygon(polygon.coords, {
                         color: randomColor,       
@@ -194,18 +198,24 @@
 
                         map.eachLayer(layer => {
                             if (layer instanceof L.Polygon) {
-                                const bounds = layer.getBounds();
-                                if (bounds.contains(latlng)) {
-                                    const polygonLatLngs = layer.getLatLngs()[0];
-                                    if (isPointInPolygon(latlng, polygonLatLngs)) {
-                                        const center = bounds.getCenter();
-                                        const distance = latlng.distanceTo(center);
-                                        if (distance < closestDistance) {
-                                            closestDistance = distance;
-                                            foundPolygon = layer;
+     
+                                const allParts = layer.getLatLngs();
+
+                                const parts = Array.isArray(allParts[0]) ? allParts : [allParts];
+
+                                parts.forEach(part => {
+                                    const bounds = L.latLngBounds(part);
+                                    if (bounds.contains(latlng)) {
+                                        if (isPointInPolygon(latlng, part)) {
+                                            const center = bounds.getCenter();
+                                            const distance = latlng.distanceTo(center);
+                                            if (distance < closestDistance) {
+                                                closestDistance = distance;
+                                                foundPolygon = layer;
+                                            }
                                         }
                                     }
-                                }
+                                });
                             }
                         });
 
@@ -214,7 +224,6 @@
                             for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
                                 const xi = polygon[i].lat, yi = polygon[i].lng;
                                 const xj = polygon[j].lat, yj = polygon[j].lng;
-                                
                                 const intersect = ((yi > point.lng) !== (yj > point.lng))
                                     && (point.lat < (xj - xi) * (point.lng - yi) / (yj - yi) + xi);
                                 if (intersect) inside = !inside;
@@ -268,9 +277,69 @@
                     });
                 });
             });
+
+
+        function calculateScore() {
+            let correctAnswers = 0;
+            let totalQuestions = 0;
+            let wrongAnswers = [];
+
+            map.eachLayer(layer => {
+                if (layer instanceof L.Polygon) {
+                    totalQuestions++;
+
+                    const originalPolygon = polygons.find(p => {
+                        return p.coords.some(coord => 
+                            coord[0] === layer.getLatLngs()[0][0].lat && 
+                            coord[1] === layer.getLatLngs()[0][0].lng
+                        );
+                    });
+
+                    if (!originalPolygon) return;
+
+                    let currentText = '';
+                    if (layer.extraData && layer.extraData.tooltip_refernce) {
+                        currentText = layer.extraData.tooltip_refernce.getContent();
+                    } else {
+                        const tooltip = layer.getTooltip();
+                        currentText = tooltip ? tooltip.getContent() : '';
+                    }
+
+                    if (currentText.toLowerCase() === originalPolygon.text.toLowerCase()) {
+                        correctAnswers++;
+                    } else if (currentText) {  
+
+                        let formattedText = originalPolygon.text.replace(/\b\w/g, char => char.toUpperCase()); 
+
+                        wrongAnswers.push({
+                            given: currentText,
+                            correct: formattedText
+                        });
+                    }
+                }
+            });
+
+            let message = '';
+
+            if (wrongAnswers.length > 0) {
+                message = "Incorrect Answers:\n";
+                wrongAnswers.forEach(wrong => {
+                    message += `Your answer: ${wrong.given}\nCorrect answer: ${wrong.correct}\n\n`;
+                });
+            } else {
+                message = "All answers are correct! 🎉";
+            }
+
+            alert(message);
+
+        }
+
+        document.getElementById('compareDraw').addEventListener('click', calculateScore);
+
         }
 
         document.addEventListener('DOMContentLoaded', main);
+
     </script>
 </body>
 </html>
