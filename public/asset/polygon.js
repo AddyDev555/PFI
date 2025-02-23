@@ -3811,7 +3811,7 @@ var polygons = [
           ]
         ], 
         text: "kamet",
-        description: ""
+        description: "Kamet, standing at 7,756 meters, is the second-highest mountain in India and the highest in the Garhwal region of Uttarakhand. It is part of the Zanskar Range and is located near the Tibet border. Unlike other Himalayan peaks, Kamet has a distinct pyramid-like shape with steep slopes and heavily glaciated terrain. The mountain is surrounded by several high ridges and subsidiary peaks, making access challenging. Due to its remote location and harsh weather conditions, early exploration was difficult, and it was first climbed in 1931. The region around Kamet is home to diverse flora and fauna, with alpine meadows and glaciers adding to its scenic beauty."
     }, 
     { 
         coords: [
@@ -3977,7 +3977,7 @@ var polygons = [
           ]
         ], 
         text: "nanda devi",
-        description: ""
+        description: "Nanda Devi, standing at 7,817 meters, is the second-highest mountain in India and the highest entirely within the country. It is located in the Garhwal Himalayas of Uttarakhand and is part of the Nanda Devi Biosphere Reserve, a UNESCO World Heritage Site. The mountain has a distinctive twin-peaked structure, with the main peak and Nanda Devi East forming a ring of high ridges. Surrounded by deep gorges and glaciers, it is a challenging climb and was once considered the highest unclimbed peak before its first ascent in 1936. The region is home to rare flora and fauna, making it ecologically significant. Due to conservation efforts, climbing has been restricted since 1983 to protect its fragile ecosystem."
     }, 
     { 
         coords: [
@@ -4143,7 +4143,7 @@ var polygons = [
           ]
         ], 
         text: "gurla mandhata",
-        description: ""
+        description: "Gurla Mandhata, standing at 7,728 meters, is the highest peak of the Nalakankar Himal in Tibet, China. It is located southwest of Lake Manasarovar and north of the India-Tibet border. The mountain is part of the Himalayas and lies opposite Mount Kailash, a sacred peak in multiple religions. Gurla Mandhata features vast glaciers and rugged terrain, making it a challenging climb. The region experiences harsh weather, with strong winds and extreme cold. Despite its remote location, it attracts climbers and trekkers seeking high-altitude adventure."
     }, 
     { 
         coords: [
@@ -4308,8 +4308,8 @@ var polygons = [
              83.3993284626879
           ]
         ], 
-        text: "dhaula giri",
-        description: ""
+        text: "dhaulagiri",
+        description: "Dhaulagiri, standing at 8,172 meters, is the seventh-highest mountain in the world, located in north-central Nepal. It is part of the Dhaulagiri Range in the Himalayas and lies west of the Kali Gandaki Gorge, which separates it from the Annapurna Massif. The mountain is known for its massive snow-covered slopes and challenging climbing routes. Dhaulagiri was first successfully climbed in 1960 and remains one of the most formidable peaks due to its steep terrain and harsh weather conditions. The region surrounding Dhaulagiri is home to glaciers, deep valleys, and diverse ecosystems within the Dhaulagiri Conservation Area."
     }, 
     { 
       coords: [
@@ -4474,8 +4474,8 @@ var polygons = [
            83.8882200642504
         ]
       ], 
-      text: "anna purna",
-      description: ""
+      text: "annapurna",
+      description: "Annapurna, standing at 8,078 meters, is a massif in the Himalayas of north-central Nepal. It is part of the Annapurna Range and includes one peak over 8,000 meters, Annapurna I, along with several lower peaks. The massif is bounded by the Kali Gandaki Gorge to the west, the Marshyangdi River to the north and east, and the Pokhara Valley to the south. Annapurna is known for its extreme climbing difficulty and high fatality rate. The region is home to the Annapurna Conservation Area, Nepal’s largest protected area, featuring diverse ecosystems, glaciers, and rich biodiversity."
     }, 
     { 
       coords: [
@@ -4641,7 +4641,7 @@ var polygons = [
         ]
       ], 
       text: "mt. everest",
-      description: ""
+      description: "Mount Everest, the world's highest peak at 8,848 m, is composed of three rock formations: the Qomolangma, North Col, and Rongbuk Formations. The Qomolangma Formation (8,600 m–summit) consists of Ordovician limestone with fossils of trilobites and crinoids. The North Col Formation (7,000–8,600 m) includes Cambrian marble, schist, and phyllite. The Rongbuk Formation (below 7,000 m) contains high-grade metamorphic rocks and leucogranites from the Indian Plate's subduction. These formations were uplifted due to the India-Asia collision during the Cenozoic era. Everest continues to rise by about 2 mm per year."
     }, 
     { 
       coords: [
@@ -4807,7 +4807,7 @@ var polygons = [
         ]
       ], 
       text: "makalu",
-      description: ""
+      description: "Makalu, the fifth-highest mountain in the world at 8,481 m, is located in the Mahalangur Himalayas on the Nepal-Tibet border, about 19 km southeast of Mount Everest. It is an isolated peak with a distinctive four-sided pyramid shape. The mountain is part of the Makalu-Barun National Park, a biodiversity hotspot with deep gorges, glaciers, and high-altitude terrains. Major glaciers, including the Barun Glacier, drain into the Arun River, a tributary of the Koshi River. Makalu is known for its steep ridges and challenging climbing routes, making it one of the most technically demanding 8,000-meter peaks."
     }, 
     { 
       coords: [
@@ -4973,6 +4973,6 @@ var polygons = [
         ]
       ], 
       text: "kanchenjunga",
-      description: ""
+      description: "Kangchenjunga Himal lies on the Nepal-India border, encompassing 16 peaks over 7,000 m, with Kangchenjunga Main reaching 8,598 m. It is the third-highest mountain in the world, after Everest and K2, with its five main peaks forming a massive ridge system. The region includes major glaciers feeding the Teesta, Arun, and Kosi rivers, contributing to the Brahmaputra and Ganges basins. Kangchenjunga was once thought to be the highest mountain until surveys in 1856 corrected this. The massif features several prominent ridges and is home to 120 glaciers, many of which have retreated due to rising temperatures. It ranks 29th in topographic prominence but is the fourth-most prominent peak in the Himalayas."
     }
 ];

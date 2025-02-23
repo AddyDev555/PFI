@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,67 +11,101 @@
             outline: none !important;
         }
 
-        .custom-tooltip {
-            background: white !important; 
+        .leaflet-popup-content-wrapper {
+            background: #fff !important;
+            border-radius: 10px !important;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3) !important;
             border: 2px solid black !important;
-            border-radius: 10px !important; 
-            padding: 5px !important; 
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3) !important; 
-            width: 60px;
-            height: 20px
+            height: 50px;
+            width: 150px;
         }
+
+        #list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 403;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            max-height: 300px; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            background: transparent
+            padding-right: 10px;
+        }
+
+        .draggable {
+            padding: 5px;
+            margin-right: 5px;
+            background-color: white;
+            border: 2px solid #333;
+            cursor: grab;
+            text-align: center;
+            position: relative;
+            transition: transform 0.2s ease-out;
+            border-radius: 5px;
+        }
+
+        .dragging {
+            position: absolute !important;
+            pointer-events: none;
+            z-index: 1000;
+            transition: none;
+        }
+
     </style>
 </head>
-
 <body>
 
     <div id="map" data-tap-disabled="true">
+        <div id="list">
+
+        </div>
     </div>
-    
+
     <img id="changeTileProvider" src="/btns/exchange.png" 
-    style="position: absolute; bottom: 15px; right: 15px; z-index: 1000; cursor: pointer; width: 28px; height: 28px;" />
+        style="position: absolute; bottom: 15px; right: 15px; z-index: 1000; cursor: pointer; width: 28px; height: 28px;" />
 
     <script src="https://unpkg.com/leaflet@latest/dist/leaflet.js"></script>
     <script src="polygon.js"></script>
     <script>
-
         const tileProviders = [
             'http://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
             'http://services.arcgisonline.com/arcgis/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}'
         ];
         let currentTileProvider = 0;
 
-        var mapOptions = {
-            center: [19.0760, 72.8777],
-            zoom: 2,
-            zoomControl: false,
-            tap: false,
-            touchZoom: true,
-            scrollWheelZoom: true,
-            doubleClickZoom: false,
-            minZoom: 4,
-            maxZoom: 8,
-            attributionControl: false,
-        };
+        let draggedItem = null;
+        let originalX = 0, originalY = 0, startX = 0, startY = 0;
 
         function main() {
-            const map = L.map('map', mapOptions);
+            const map = L.map('map', {
+                center: [19.0760, 72.8777],
+                zoom: 2,
+                zoomControl: false,
+                tap: false,
+                touchZoom: true,
+                scrollWheelZoom: true,
+                doubleClickZoom: false,
+                minZoom: 4,
+                maxZoom: 8,
+                attributionControl: false,
+            });
+
             let tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
 
             map.whenReady(async function () {
+                polygons.forEach((polygon, index) => {
+                    let poly = L.polygon(polygon.coords, {
+                        color: 'blue',       
+                        fillColor: 'lightblue', 
+                        fillOpacity: 0.5
+                    }).addTo(map);
 
-            polygons.forEach(polygon => {
-                let poly = L.polygon(polygon.coords, {
-                    color: 'blue',       
-                    fillColor: 'lightblue', 
-                    fillOpacity: 0.5
-                }).addTo(map);
-
-                // poly.bindTooltip(`<b>{$datafromdragtext}</b>`, { 
-                //     className: 'custom-tooltip', permanent: false, direction: "top", sticky: true
-                // });
-            });
-
+                    let popupDiv = document.createElement("div");
+                    poly.bindPopup(popupDiv);
+                });
             });
 
             document.getElementById('changeTileProvider').addEventListener('click', function () {
@@ -80,12 +113,94 @@
                 map.removeLayer(tileLayer);
                 tileLayer = L.tileLayer(tileProviders[currentTileProvider]).addTo(map);
             });
+            
+            const list = document.getElementById('list');
+
+            polygons.forEach(polygon => {
+                let formattedText = polygon.text.replace(/\b\w/g, char => char.toUpperCase()); 
+
+                const item = document.createElement('div');
+                item.classList.add('draggable');
+                item.textContent = formattedText;
+                list.appendChild(item);
+            });
+
+            document.querySelectorAll('.draggable').forEach(item => {
+                item.addEventListener('mousedown', (event) => {
+                    event.preventDefault();
+
+                    draggedItem = event.target;
+                    if (!draggedItem) return;
+
+                    const rect = draggedItem.getBoundingClientRect();
+                    const offsetX = rect.right - event.clientX; 
+                    const offsetY = event.clientY - rect.top; 
+
+                    draggedItem.classList.add('dragging');
+                    draggedItem.style.position = 'absolute';
+                    draggedItem.style.zIndex = '1000';
+
+                    map.dragging.disable();
+
+                    document.body.appendChild(draggedItem); 
+
+                    function moveAt(pageX, pageY) {
+                        draggedItem.style.right = `${window.innerWidth - pageX - offsetX}px`;
+                        draggedItem.style.top = `${pageY - offsetY}px`;
+                    }
+
+                    moveAt(event.pageX, event.pageY);
+
+                    function onMouseMove(event) {
+                        moveAt(event.pageX, event.pageY);
+                    }
+
+                    document.addEventListener('mousemove', onMouseMove);
+
+                    document.addEventListener('mouseup', () => {
+                        document.removeEventListener('mousemove', onMouseMove);
+
+                        if (!draggedItem) return;
+
+                        draggedItem.classList.remove('dragging');
+
+                        const draggedRect = draggedItem.getBoundingClientRect();
+                        const draggedX = draggedRect.left + draggedRect.width / 2;
+                        const draggedY = draggedRect.top + draggedRect.height / 2;
+                        const latlng = map.containerPointToLatLng([draggedX, draggedY]);
+
+                        let foundPolygon = null;
+
+                        map.eachLayer(layer => {
+                            if (layer instanceof L.Polygon) {
+                                if (layer.getBounds().contains(latlng)) {
+                                    foundPolygon = layer;
+                                }
+                            }
+                        });
+
+                        if (foundPolygon) {
+                            foundPolygon.bindPopup(draggedItem.textContent).openPopup();
+                        }
+
+                        // Reset the dragged item position
+                        document.getElementById('list').appendChild(draggedItem);
+                        draggedItem.style.position = 'relative';
+                        draggedItem.style.right = 'auto';
+                        draggedItem.style.top = 'auto';
+
+                        map.dragging.enable();
+                        draggedItem = null;
+                    });
+
+                });
+            });
 
         }
 
         document.addEventListener('DOMContentLoaded', main);
 
     </script>
-</body>
 
+</body>
 </html>
