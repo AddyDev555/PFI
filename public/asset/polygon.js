@@ -1475,7 +1475,8 @@ var polygons = [
             ]
           ], 
         text: "greater himalaya",
-        description: ""
+        description: "",
+        tooltip_correction: { lat: 32.510307, lng: 77.4117023 }
     }, 
     { 
         coords: [
@@ -1749,7 +1750,8 @@ var polygons = [
             ]
           ], 
         text: "middle himalaya",
-        description: ""
+        description: "",
+        tooltip_correction: { lat: 31.812898, lng: 77.399809 }
     }, 
     {
         coords: [
@@ -2063,7 +2065,8 @@ var polygons = [
             ]
           ], 
         text: "shiwalik range",
-        description: ""
+        description: "",
+        tooltip_correction: { lat: 30.72418, lng: 77.0154633 }
     }, 
     { 
         coords: [
