@@ -27,10 +27,10 @@
             gap: 10px;
             z-index: 403;
             position: absolute;
-            top: 10px;
+            top: 60px;
             right: 10px;
             max-height: 300px; 
-            overflow-y: auto; 
+            overflow: hidden;
             overflow-x: hidden;
             background: transparent;
             padding-right: 10px;
@@ -54,11 +54,37 @@
             z-index: 1000;
             transition: none;
         }
+
+        .scroll-btn {
+            position: absolute;
+            right: 15px;
+            background-color: white;
+            border: 2px solid #333;
+            padding: 5px;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 5px;
+            z-index: 404;
+            width: 30px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        #scroll-up {
+            top: 10px;
+        }
+
+        #scroll-down {
+            top: 380px;
+        }
+
     </style>
 </head>
 <body>
     <div id="map" data-tap-disabled="true">
+        <div id="scroll-up" class="scroll-btn">▲</div>
         <div id="list"></div>
+        <div id="scroll-down" class="scroll-btn">▼</div>
     </div>
 
     <img id="changeTileProvider" src="/btns/exchange.png" 
@@ -121,7 +147,8 @@
 
                         poly.extraData = { 
                             tooltip_correction: polygon.tooltip_correction,
-                            tooltip_refernce: tooltip
+                            tooltip_refernce: tooltip,
+                            tooltip_text: ""
                         };
 
                     } else {
@@ -131,6 +158,10 @@
                             direction: 'center',
                             className: 'leaflet-tooltip-custom'
                         });
+
+                        poly.extraData = { 
+                            tooltip_text: ""
+                        };
 
                     }
                 });
@@ -154,130 +185,128 @@
             });
 
             document.querySelectorAll('.draggable').forEach(item => {
-                item.addEventListener('mousedown', (event) => {
-                    event.preventDefault();
+            item.addEventListener('mousedown', startDrag);
+            item.addEventListener('touchstart', startDrag, { passive: false });
 
-                    draggedItem = event.target;
+            function startDrag(event) {
+                event.preventDefault();
+
+                draggedItem = event.target;
+                if (!draggedItem) return;
+
+                const rect = draggedItem.getBoundingClientRect();
+                const clientX = event.touches ? event.touches[0].clientX : event.clientX;
+                const clientY = event.touches ? event.touches[0].clientY : event.clientY;
+
+                const offsetX = clientX - rect.left;
+                const offsetY = clientY - rect.top;
+
+                draggedItem.classList.add('dragging');
+                draggedItem.style.position = 'absolute';
+                draggedItem.style.zIndex = '1000';
+
+                map.dragging.disable();
+                document.body.appendChild(draggedItem);
+
+                function moveAt(pageX, pageY) {
+                    draggedItem.style.left = `${pageX - offsetX}px`;
+                    draggedItem.style.top = `${pageY - offsetY}px`;
+                }
+
+                moveAt(clientX, clientY);
+
+                function onMove(event) {
+                    const moveX = event.touches ? event.touches[0].pageX : event.pageX;
+                    const moveY = event.touches ? event.touches[0].pageY : event.pageY;
+                    moveAt(moveX, moveY);
+                }
+
+                function onEnd(event) {
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onEnd);
+                    document.removeEventListener('touchmove', onMove);
+                    document.removeEventListener('touchend', onEnd);
+
                     if (!draggedItem) return;
+                    draggedItem.classList.remove('dragging');
 
-                    const rect = draggedItem.getBoundingClientRect();
-                    const offsetX = event.clientX - rect.left;
-                    const offsetY = event.clientY - rect.top;
+                    const latlng = map.mouseEventToLatLng(event.changedTouches ? event.changedTouches[0] : event);
+                    let foundPolygon = null;
+                    let closestDistance = Infinity;
 
-                    draggedItem.classList.add('dragging');
-                    draggedItem.style.position = 'absolute';
-                    draggedItem.style.zIndex = '1000';
+                    map.eachLayer(layer => {
+                        if (layer instanceof L.Polygon) {
+                            const allParts = layer.getLatLngs();
+                            const parts = Array.isArray(allParts[0]) ? allParts : [allParts];
 
-                    map.dragging.disable();
-
-                    document.body.appendChild(draggedItem);
-
-                    function moveAt(pageX, pageY) {
-                        draggedItem.style.left = `${pageX - offsetX}px`;
-                        draggedItem.style.top = `${pageY - offsetY}px`;
-                    }
-
-                    moveAt(event.pageX, event.pageY);
-
-                    function onMouseMove(event) {
-                        moveAt(event.pageX, event.pageY);
-                    }
-
-                    document.addEventListener('mousemove', onMouseMove);
-
-                    document.addEventListener('mouseup', (event) => {
-                        document.removeEventListener('mousemove', onMouseMove);
-
-                        if (!draggedItem) return;
-
-                        draggedItem.classList.remove('dragging');
-
-                        const latlng = map.mouseEventToLatLng(event);
-                        let foundPolygon = null;
-                        let closestDistance = Infinity;
-
-                        map.eachLayer(layer => {
-                            if (layer instanceof L.Polygon) {
-     
-                                const allParts = layer.getLatLngs();
-
-                                const parts = Array.isArray(allParts[0]) ? allParts : [allParts];
-
-                                parts.forEach(part => {
-                                    const bounds = L.latLngBounds(part);
-                                    if (bounds.contains(latlng)) {
-                                        if (isPointInPolygon(latlng, part)) {
-                                            const center = bounds.getCenter();
-                                            const distance = latlng.distanceTo(center);
-                                            if (distance < closestDistance) {
-                                                closestDistance = distance;
-                                                foundPolygon = layer;
-                                            }
+                            parts.forEach(part => {
+                                const bounds = L.latLngBounds(part);
+                                if (bounds.contains(latlng)) {
+                                    if (isPointInPolygon(latlng, part)) {
+                                        const center = bounds.getCenter();
+                                        const distance = latlng.distanceTo(center);
+                                        if (distance < closestDistance) {
+                                            closestDistance = distance;
+                                            foundPolygon = layer;
                                         }
                                     }
-                                });
-                            }
-                        });
-
-                        function isPointInPolygon(point, polygon) {
-                            let inside = false;
-                            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-                                const xi = polygon[i].lat, yi = polygon[i].lng;
-                                const xj = polygon[j].lat, yj = polygon[j].lng;
-                                const intersect = ((yi > point.lng) !== (yj > point.lng))
-                                    && (point.lat < (xj - xi) * (point.lng - yi) / (yj - yi) + xi);
-                                if (intersect) inside = !inside;
-                            }
-                            return inside;
+                                }
+                            });
                         }
-
-                        if (foundPolygon) {
-
-                            if (foundPolygon.extraData && foundPolygon.extraData.tooltip_refernce) {
-                                map.removeLayer(foundPolygon.extraData.tooltip_refernce);
-                                foundPolygon.extraData.tooltip_refernce = null;
-                            }
-
-                            foundPolygon.unbindTooltip();
-
-                            if (foundPolygon.extraData) {
-                                let customLatLng = [foundPolygon.extraData.tooltip_correction.lat, foundPolygon.extraData.tooltip_correction.lng]; 
-
-                                let tooltip = L.tooltip({
-                                    permanent: true,  
-                                    direction: 'center',
-                                    className: 'leaflet-tooltip-custom'
-                                })
-                                .setLatLng(customLatLng)
-                                .setContent(draggedItem.textContent) 
-                                .addTo(map);
-
-                                foundPolygon.extraData.tooltip_refernce = tooltip;
-
-                            } else {
-
-                                foundPolygon.bindTooltip(draggedItem.textContent, {
-                                    permanent: true,
-                                    direction: 'center',
-                                    className: 'leaflet-tooltip-custom'
-                                });
-
-                            }
-                            draggedItem.parentNode.removeChild(draggedItem);
-                        } else {
-                            const list = document.getElementById('list');
-                            list.appendChild(draggedItem);
-                            draggedItem.style.position = 'relative';
-                            draggedItem.style.left = 'auto';
-                            draggedItem.style.top = 'auto';
-                        }
-
-                        map.dragging.enable();
-                        draggedItem = null;
                     });
-                });
-            });
 
+                    function isPointInPolygon(point, polygon) {
+                        let inside = false;
+                        for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                            const xi = polygon[i].lat, yi = polygon[i].lng;
+                            const xj = polygon[j].lat, yj = polygon[j].lng;
+                            const intersect = ((yi > point.lng) !== (yj > point.lng))
+                                && (point.lat < (xj - xi) * (point.lng - yi) / (yj - yi) + xi);
+                            if (intersect) inside = !inside;
+                        }
+                        return inside;
+                    }
+
+                    if (foundPolygon) {
+                     
+                        let previousText = foundPolygon.extraData.tooltip_text;
+
+                        if (previousText) {
+                          
+                            const previousItem = document.createElement('div');
+                            previousItem.classList.add('draggable');
+                            previousItem.textContent = previousText;
+                            list.appendChild(previousItem);
+
+                            previousItem.addEventListener('mousedown', startDrag);
+                            previousItem.addEventListener('touchstart', startDrag, { passive: false });
+                        }
+
+                        foundPolygon.extraData.tooltip_text = draggedItem.textContent;
+                        if (foundPolygon.extraData.tooltip_refernce) {
+                            foundPolygon.extraData.tooltip_refernce.setContent(draggedItem.textContent);
+                        } else {
+                            foundPolygon.bindTooltip(draggedItem.textContent, {
+                                permanent: true,
+                                direction: 'center',
+                                className: 'leaflet-tooltip-custom'
+                            });
+                        }
+                    }
+
+                    draggedItem.remove();
+                    draggedItem = null;
+
+                    map.dragging.enable();
+
+                }
+
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onEnd);
+                document.addEventListener('touchmove', onMove, { passive: false });
+                document.addEventListener('touchend', onEnd);
+            }
+        });
 
         function calculateScore() {
             let correctAnswers = 0;
@@ -326,6 +355,9 @@
                 wrongAnswers.forEach(wrong => {
                     message += `Your answer: ${wrong.given}\nCorrect answer: ${wrong.correct}\n\n`;
                 });
+                message += `Score: ${correctAnswers} / ${totalQuestions}`;
+            } else if (correctAnswers == 0) {
+                message = "No Answers are provided!";
             } else {
                 message = "All answers are correct! 🎉";
             }
@@ -339,6 +371,20 @@
         }
 
         document.addEventListener('DOMContentLoaded', main);
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const list = document.getElementById("list");
+            const scrollUp = document.getElementById("scroll-up");
+            const scrollDown = document.getElementById("scroll-down");
+
+            scrollUp.addEventListener("click", function () {
+                list.scrollBy({ top: -50, behavior: "smooth" });
+            });
+
+            scrollDown.addEventListener("click", function () {
+                list.scrollBy({ top: 50, behavior: "smooth" });
+            });
+        });
 
     </script>
 </body>

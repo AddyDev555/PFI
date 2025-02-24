@@ -363,26 +363,32 @@
                 }
             });
 
-            document.getElementById('compareDraw').addEventListener('click', function () {     
-                if (!drawingEnabled) return;            
-                redrawStrokes(); 
+            document.getElementById('compareDraw').addEventListener('click', function () {  
+                map.setView([19.0760, 72.8777], 4); 
 
-                const drawData = drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
-                const overlayData = ctx.getImageData(0, 0, overlayCanvas.width, overlayCanvas.height);
+                map.once('moveend', function () { 
+                    setTimeout(() => {
+                            
+                        redrawStrokes(); 
 
-                let drawPixels = 0, overlayPixels = 0, overlapPixels = 0;
+                        const drawData = drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
+                        const overlayData = ctx.getImageData(0, 0, overlayCanvas.width, overlayCanvas.height);
 
-                for (let i = 0; i < drawData.data.length; i += 4) {
-                    const isDrawn = drawData.data[i + 3] > 0;
-                    const isOverlay = overlayData.data[i + 3] > 0;
+                        let drawPixels = 0, overlayPixels = 0, overlapPixels = 0;
 
-                    if (isDrawn) drawPixels++;
-                    if (isOverlay) overlayPixels++;
-                    if (isDrawn && isOverlay) overlapPixels++;  
-                }
+                        for (let i = 0; i < drawData.data.length; i += 4) {
+                            const isDrawn = drawData.data[i + 3] > 0;
+                            const isOverlay = overlayData.data[i + 3] > 0;
 
-                const overlapRatio = overlayPixels ? (overlapPixels / overlayPixels).toFixed(2) : 0;
-                alert(`${overlapRatio * 100}% Match`);
+                            if (isDrawn) drawPixels++;
+                            if (isOverlay) overlayPixels++;
+                            if (isDrawn && isOverlay) overlapPixels++;  
+                        }
+
+                        const overlapRatio = overlayPixels ? (overlapPixels / overlayPixels).toFixed(2) : 0;
+                        alert(`${overlapRatio * 100}% Match`);
+                    }, 2000); 
+                });
             });
 
             function screenToGeo(x, y, map) {
@@ -399,7 +405,7 @@
 
             function getStrokeWidth(map) {
                 const zoom = map.getZoom();
-                const baseWidth = 3; 
+                const baseWidth = 6; 
                 return baseWidth * Math.pow(1.2, zoom - mapOptions.minZoom); 
             }
 
