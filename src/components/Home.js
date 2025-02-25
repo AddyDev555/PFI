@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "./css/Home.css";
 import DASmap from './DASmap';
 import DADmap from './DADmap';
@@ -6,6 +6,7 @@ import HTImap from './HTImap';
 
 export default function Home() {
     const [id, setId] = useState(1);
+    const [matchResult, setMatchResult] = useState(localStorage.getItem("matchResult") || "Waiting...");
 
     function toggleInsContainer() {
         const instructionCon = document.querySelector(".instructionCon");
@@ -19,6 +20,31 @@ export default function Home() {
         leftArrow.style.display = isCollapsed ? "none" : "block";
         rightArrow.style.display = isCollapsed ? "block" : "none";
     }    
+
+    useEffect(() => {
+        const checkStorage = setInterval(() => {
+            let ratio = localStorage.getItem("matchResult");
+            let medal = document.getElementById("medal");
+            let medalName = document.getElementById("medalName");
+            let medal_con = document.querySelector(".medal_con");
+            if(ratio >= 50){
+                setMatchResult(`Score: ${ratio}%, Good Job! you are an above Average Student you can perform better!`);
+                medal.classList.add("fi-ss-first-medal");
+                medal.classList.add("medal1");
+                medal_con.style.opacity = 1;
+                medalName.textContent = "You Won a Gold Medal";
+            }
+            else if(ratio <= 50){
+                setMatchResult(`Score: ${ratio}%, Not Bad!, Keep trying i know you will get it for sure.`);
+                medal.classList.add("fi-ss-second-medal");
+                medal.classList.add("medal2");
+                medal_con.style.opacity = 1;
+                medalName.textContent = "You Won a Silver Medal";
+            }
+        }, 1000);
+
+        return () => clearInterval(checkStorage);
+    }, []);
 
     return (
         <main>
@@ -44,11 +70,15 @@ export default function Home() {
 
                                 <h2>Himalayan Ranges</h2>
                                 <span className='activityHeader'>Activity 1: Coloring</span>
-                                <p>Paint the Himalayan Mountain Ranges. To start painting, select the pencil icon and drag the mouse on the appropriate regions.</p>
-                                <p className="subTit">If the coloring is done, submit your answer.</p>
-
+                                <p>Paint the Himalayan Mountain Ranges, Plateau and Costal Regions of India. To start painting, select the pencil icon and drag the mouse on the appropriate regions.</p>
+                                <p className="subTit">If the coloring is done, submit your answer by clicking the Compare icon.</p>
+                                <h2>Result will be displayed below</h2>
+                                <p className="subTit">{matchResult}</p>
+                                <div className="medal_con">
+                                    <i id="medal" class="fi"></i>
+                                </div>
+                                <h2 id="medalName"></h2>
                             </div>
-                
                     )}
 
                     {id === 2 && (
@@ -62,7 +92,6 @@ export default function Home() {
                                     Carefully place each range in the correct position to test your knowledge of their geography.
                                     Once you've arranged them, click the "Submit" button to check your answers!
                                 </p>
-
                             </div>
                     )}
 

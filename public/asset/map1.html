@@ -386,7 +386,8 @@
                         }
 
                         const overlapRatio = overlayPixels ? (overlapPixels / overlayPixels).toFixed(2) : 0;
-                        alert(`${overlapRatio * 100}% Match`);
+                        let overlapRatioSend = (overlapRatio * 100)
+                        localStorage.setItem("matchResult", overlapRatioSend);
                     }, 2000); 
                 });
             });
