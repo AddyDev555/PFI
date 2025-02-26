@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import "../src/components/css/App.css";
 import Theory from "./components/Theory"
+import Procedure from "./components/Procedure"
 import Simulation from "./components/Simulation";
 
 function App() {
@@ -91,13 +92,16 @@ function App() {
 
         {ActiveTab === 1 && <Theory />}
 
+        {ActiveTab === 2 && <Procedure />}
+
         {ActiveTab === 4 && <Simulation />}
 
-        {ActiveTab === 6 && <p>
-                              <a href="https://ncert.nic.in/textbook.php?iess1=2-6" target="_blank" class="styled-link">
-                                • NCERT Class 9 Geography - Physical Features of India
-                              </a>
-                          </p>
+        {ActiveTab === 6 && 
+          <p>
+            <a href="https://ncert.nic.in/textbook.php?iess1=2-6" target="_blank" class="styled-link">
+              • NCERT Class 9 Geography - Physical Features of India
+            </a>
+          </p>
         }
 
       </div>

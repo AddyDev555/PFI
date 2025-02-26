@@ -7,6 +7,7 @@ import HTImap from './HTImap';
 export default function Simulation() {
     const [ActiveMap, setActiveMap] = useState(1);
     const [matchResult, setMatchResult] = useState(localStorage.getItem("matchResult") || "Waiting...");
+    const [prevRatio, setPrevRatio] = useState(null); 
 
     function toggleInsContainer() {
         const instructionCon = document.querySelector(".instructionCon");
@@ -25,31 +26,40 @@ export default function Simulation() {
 
     useEffect(() => {
         const checkStorage = setInterval(() => {
-            let ratio = parseFloat(localStorage.getItem("matchResult")) || 0;
+            let ratio = parseFloat(localStorage.getItem("matchResult")).toFixed(2) || 0;
+            console.log(ratio);
             let medal = document.getElementById("medal");
             let medalName = document.getElementById("medalName");
             let medal_con = document.querySelector(".medal_con");
 
-            if (!medal || !medalName || !medal_con) return;
+            if (!medal || !medalName || !medal_con) return; 
 
-            if(ratio >= 50){
+            const instructionCon = document.querySelector(".instructionCon");
+
+            if (instructionCon && instructionCon.classList.contains("collapsed") && ratio !== prevRatio) {
+                toggleInsContainer();
+            }
+
+            if (ratio >= 50) {
                 setMatchResult(`Score: ${ratio}%, Good Job! you are an above Average Student you can perform better!`);
                 medal.classList.add("fi-ss-first-medal");
                 medal.classList.add("medal1");
                 medal_con.style.opacity = 1;
                 medalName.textContent = "You Won a Gold Medal";
-            }
-            else if(ratio <= 50){
-                setMatchResult(`Score: ${ratio}%, Not Bad!, Keep trying i know you will get it for sure.`);
+            } 
+            else if (ratio <= 50 && ratio >= 0) {
+                setMatchResult(`Score: ${ratio}%, Not Bad! Keep trying, I know you will get it for sure.`);
                 medal.classList.add("fi-ss-second-medal");
                 medal.classList.add("medal2");
                 medal_con.style.opacity = 1;
                 medalName.textContent = "You Won a Silver Medal";
             }
+
+            setPrevRatio(ratio);
         }, 1000);
 
         return () => clearInterval(checkStorage);
-    }, []);
+    }, [prevRatio]);
 
     return (
             <div className="simulationCon">

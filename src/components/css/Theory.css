@@ -1,8 +1,11 @@
 .divContent {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
     font-family: Arial, sans-serif;
+    width: 80%;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
 h2, h3 {
@@ -11,10 +14,7 @@ h2, h3 {
 }
 
 p {
-    font-size: 16px;
-    line-height: 1.5;
     text-align: left;
-    color: #555;
 }
 
 .table-container {
