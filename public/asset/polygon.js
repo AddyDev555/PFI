@@ -35,7 +35,7 @@ var polygons = [
             ]
           ], 
         text: "gir range",
-        description: `The eastern edge of the Sulaiman range runs 450 km (280 miles) from the Gomal Pass in Pakistan's Khyber Pakhtunkhwa province to near the city of Jacobabad in Sindh province, and further stretches into south-west Punjab. In Afghanistan, the western edge of the range starts just beyond the northern Loya Paktia province where they meet the Koh-i-Baba range. South from there, they meet the Spin Ghar range northeast of Gardez in Paktia province, but towards west, the mountain range drops gradually in Kandahar southwest into Helmand and the Sistan Basin. The Sulaiman Range, and the high plateaus to the west of it, helps form a natural barrier against the humid winds that blow from the Indian Ocean, creating arid conditions across southern and central Afghanistan to the west and north. In contrast, the relatively flat and low-lying Indus delta is situated due east and south of the Sulaimans. Rivers that drain the Sulaimans include the Gomal River which flows eastward into the Indus River, and the Dori River and other small tributaries of the Arghandab River, which flow southwestward into the Helmand River.`
+        description: "Gir Range, low mountain range in western Gujarat state, west-central India, on the southern Kathiawar Peninsula. The range is extremely rugged with a steep slope seaward to the south and a gradual slope inland to the north. From it to the north runs a low, narrow, dissected range rising to Gorakhnath (1,117 metres high) in the broad mass of the Girnar Hills."
     },
     { 
         coords: [
@@ -153,7 +153,7 @@ var polygons = [
             ]
           ], 
         text: "sulaiman range",
-        description: ""
+        description: "The Sulaiman Range is a mountain range in Pakistan and Afghanistan, forming a natural barrier between the Indus River Valley and the Iranian Plateau. It runs north-south and influences the region’s climate by blocking monsoon winds. The highest peak, Takht-e-Sulaiman, stands at 3,487 meters and holds cultural significance. The terrain is rugged and dry, with sparse vegetation like juniper and wild olive trees."
     },
     { 
         coords: [
@@ -223,7 +223,7 @@ var polygons = [
             ]
           ], 
         text: "hindu kush",
-        description: ""
+        description: "The Hindu Kush is a major mountain range stretching from central Afghanistan to northern Pakistan, forming part of the Greater Himalayas. It serves as a natural divide between South Asia and Central Asia, with rugged terrain and deep valleys. The highest peak, Tirich Mir, stands at 7,708 meters in Pakistan."
     },
     { 
         coords: [
@@ -285,7 +285,7 @@ var polygons = [
             ]
           ], 
         text: "pamir knot",
-        description: ""
+        description: "The Pamir Knot is a highland region in Central Asia, where several major mountain ranges, including the Hindu Kush, Karakoram, Tian Shan, and Kunlun, converge. It is located mainly in Tajikistan, with parts extending into Afghanistan, China, and Pakistan. The region is known for its rugged terrain, high-altitude plateaus, and glaciers, with Ismoil Somoni Peak (7,495 m) as its highest point."
     },
     { 
         coords: [
@@ -375,7 +375,7 @@ var polygons = [
             ]
           ], 
         text: "kunlun mts.",
-        description: ""
+        description: "The Kunlun Mountains are a major mountain range in China, extending over 3,000 km from the Pamir Knot in the west to the Tibetan Plateau in the east. They form the northern edge of Tibet and separate it from the Tarim Basin and the Taklamakan Desert. The range features glaciated peaks, high plateaus, and deep valleys, with Liushi Shan (7,167 m) as its highest peak."
     },
     { 
         coords: [
@@ -457,7 +457,7 @@ var polygons = [
             ]
           ], 
         text: "karakoram range",
-        description: ""
+        description: "The Karakoram Range is a major mountain range spanning Pakistan, India, and China, forming part of the Greater Himalayas. It stretches over 500 km, with K2 (8,611 m) as its highest peak, the second tallest in the world. The range features massive glaciers, including the Siachen Glacier, the world's second-longest non-polar glacier. It serves as a natural barrier between South and Central Asia and has an extreme climate, with harsh winters and minimal vegetation."
     },
     { 
         coords: [
@@ -515,7 +515,7 @@ var polygons = [
             ]
           ], 
         text: "ladakh range",
-        description: ""
+        description: "The Ladakh Range is a mountain range in northern India, extending from eastern Jammu & Kashmir to western Tibet. It lies between the Karakoram Range and the Zanskar Range, forming part of the Trans-Himalayas. The range is characterized by barren landscapes, high-altitude cold deserts, and minimal vegetation. Its peaks typically range between 5,000 to 6,000 meters, with Stok Kangri (6,153 m) being one of the highest."
     },  
     { 
         coords: [
@@ -729,7 +729,7 @@ var polygons = [
             ]
           ], 
         text: "western ghats",
-        description: ""
+        description: "The Western Ghats, also known as the Sahyadri Hills, run parallel to the western coast of India, covering Gujarat, Maharashtra, Goa, Karnataka, Kerala, and Tamil Nadu. The Western Ghats are higher than the Eastern Ghats, with an average elevation of 900–1600 metres, whereas the Eastern Ghats average around 600 metres. The height of the Western Ghats progressively increases from north to south, with Anai Mudi (2,695 m) and Doda Betta (2,637 m) being the highest peaks."
     },
     { 
         coords: [
@@ -783,7 +783,7 @@ var polygons = [
             ]
           ], 
         text: "garo khasi jaintia",
-        description: ""
+        description: "The Garo, Khasi, and Jaintia Hills are located in the Meghalaya plateau in northeastern India. These hills are part of the Shillong Plateau and are extensions of the Peninsular Plateau, separated by faults. The Khasi and Jaintia Hills are made of ancient crystalline rocks, while the Garo Hills lie to the west."
     },  
     { 
         coords: [
@@ -825,7 +825,7 @@ var polygons = [
             ]
           ], 
         text: "mizo hills",
-        description: ""
+        description: "The Mizo Hills, also known as the Lushai Hills, are located in Mizoram, northeastern India. They are part of the Purvanchal Range, which extends from the eastern Himalayas. These hills are characterized by rugged, steep slopes and deep valleys, with an average elevation of 900–1,200 meters. The highest peak is Phawngpui (Blue Mountain), standing at 2,157 meters."
     },  
     { 
         coords: [
@@ -879,7 +879,7 @@ var polygons = [
             ]
           ], 
         text: "naga hills",
-        description: ""
+        description: "The Naga Hills are a part of the Purvanchal Range in northeastern India and northwestern Myanmar. They form a natural boundary between Nagaland and Myanmar, extending into Arunachal Pradesh. The hills are characterized by steep, rugged terrain with deep valleys and dense forests. The highest peak in the range is Mount Saramati (3,841 meters), which lies on the India-Myanmar border."
     }, 
     { 
         coords: [
@@ -945,7 +945,7 @@ var polygons = [
             ]
           ], 
         text: "patkai bum",
-        description: ""
+        description: "The Patkai Bum is a mountain range in northeastern India and northwestern Myanmar, forming part of the Purvanchal Hills. It acts as a natural border between Arunachal Pradesh (India) and Myanmar. The range is characterized by steep slopes, deep valleys, and dense tropical forests."
     }, 
     { 
         coords: [
@@ -1035,7 +1035,7 @@ var polygons = [
             ]
           ], 
         text: "kailash range",
-        description: ""
+        description: "The Kailash Range is a subrange of the Trans-Himalayas, located in Tibet and extending into India and Nepal. It is most famous for Mount Kailash (6,638 meters), a sacred peak revered in Hinduism, Buddhism, Jainism, and Bon traditions. The range is the source of major rivers like the Indus, Sutlej, Brahmaputra, and Karnali (a tributary of the Ganges)."
     }, 
     { 
         coords: [
@@ -1169,7 +1169,7 @@ var polygons = [
             ]
           ], 
         text: "zaskar range",
-        description: ""
+        description: "The Zaskar Range is a subrange of the Himalayas, located in the Ladakh region of India and extending into Tibet. It lies to the north of the Great Himalaya Range, forming a natural boundary between Ladakh and Himachal Pradesh. The range consists of rugged, snow-covered peaks, with some exceeding 6,000 meters in height. Notable passes, such as the Pensi La and Shingo La, connect Ladakh with Himachal Pradesh."
     }, 
     { 
         coords: [
@@ -1475,7 +1475,7 @@ var polygons = [
             ]
           ], 
         text: "greater himalaya",
-        description: "",
+        description: "The Greater Himalaya, also known as the Himadri, is the highest and most continuous range of the Himalayan mountain system. It stretches across India, Nepal, Bhutan, and Tibet, forming the backbone of the Himalayas. This range includes some of the world's tallest peaks, such as Mount Everest (8,848 m), Kangchenjunga (8,586 m), and Nanda Devi (7,817 m).",
         tooltip_correction: { lat: 32.510307, lng: 77.4117023 }
     }, 
     { 
@@ -1750,7 +1750,7 @@ var polygons = [
             ]
           ], 
         text: "middle himalaya",
-        description: "",
+        description: "The Middle Himalaya, also known as the Lesser Himalayas, lies between the Greater Himalayas (Himadri) and the Shiwalik Range. It extends across India, Nepal, and Bhutan, with an average elevation of 3,700 to 4,500 meters. The range consists of metamorphic and sedimentary rocks, making it more stable than the Shiwaliks. Famous hill stations like Shimla, Mussoorie, Nainital, and Darjeeling are located in this region.",
         tooltip_correction: { lat: 31.812898, lng: 77.399809 }
     }, 
     {
@@ -2065,7 +2065,7 @@ var polygons = [
             ]
           ], 
         text: "shiwalik range",
-        description: "",
+        description: "The Shiwalik Range, also known as the Outer Himalayas, is the southernmost range of the Himalayan mountain system. It stretches from Jammu and Kashmir in the northwest to Arunachal Pradesh in the east, covering a length of about 2,400 km. The average elevation of the Shiwaliks ranges from 600 to 1,500 meters.",
         tooltip_correction: { lat: 30.72418, lng: 77.0154633 }
     }, 
     { 
@@ -2120,7 +2120,7 @@ var polygons = [
             ]
           ], 
         text: "aravali range",
-        description: ""
+        description: "The Aravali Range is one of the oldest mountain ranges in the world, stretching across northwestern India, mainly in Rajasthan, and extending into Haryana, Delhi, and Gujarat. It runs in a southwest to northeast direction for about 800 km. The range is geologically ancient, formed during the Precambrian era. The highest peak is Guru Shikhar (1,722 meters) in Mount Abu, Rajasthan."
     }, 
     { 
         coords: [
@@ -2182,7 +2182,7 @@ var polygons = [
             ]
           ], 
         text: "vindhya range",
-        description: ""
+        description: "The Vindhya Range is a mountain range in central India, extending across Madhya Pradesh, Uttar Pradesh, and parts of Rajasthan and Bihar. It runs parallel to the Satpura Range and forms a natural divide between northern and southern India. The range consists of low hills and plateaus, primarily made of sandstone, limestone, and quartzite. Its highest peak is Kalumar Peak (752 m)."
     }, 
     { 
         coords: [
@@ -2280,7 +2280,7 @@ var polygons = [
             ]
           ], 
         text: "satpura range",
-        description: ""
+        description: "The Satpura Range is a mountain range in central India, stretching across Madhya Pradesh, Maharashtra, and Chhattisgarh. It runs parallel to the Vindhya Range and forms a watershed between the Narmada and Tapti rivers. The range is characterized by dense forests, deep valleys, and rugged terrain, with Dhoopgarh (1,350 m) being its highest peak."
     }, 
     { 
         coords: [
@@ -2456,7 +2456,7 @@ var polygons = [
             ]
             ], 
         text: "dafla hills",
-        description: ""
+        description: "The Dafla Hills are located along the India-Bhutan border, forming part of the Eastern Himalayas in Arunachal Pradesh, India. These hills are characterized by dense forests, steep slopes, and deep valleys, making them a challenging terrain."
     }, 
     { 
         coords: [
@@ -2538,7 +2538,7 @@ var polygons = [
             ]
             ], 
         text: "mahadeo hills",
-        description: ""
+        description: "The Mahadeo Hills are a part of the Satpura Range in Madhya Pradesh, India, located mainly in the southern region of the state. These hills are composed of sandstone and basalt, with rugged terrain and deep valleys. The highest peak, Dhupgarh, rises to 1,350 meters near Pachmarhi, a popular hill station."
     }, 
     { 
         coords: [
@@ -2652,7 +2652,7 @@ var polygons = [
             ]
             ], 
         text: "eastern ghats",
-        description: ""
+        description: "The Eastern Ghats are a discontinuous mountain range along the eastern coast of India, stretching from Odisha to Tamil Nadu. These hills are lower and more eroded than the Western Ghats, with Mahendragiri (1,501 meters) in Odisha being the highest peak."
     }, 
     { 
         coords: [
@@ -2818,7 +2818,7 @@ var polygons = [
             ]
           ], 
         text: "anai malai",
-        description: ""
+        description: "The Anai Malai Hills, also known as the Elephant Hills, are located in the Western Ghats of Tamil Nadu and Kerala, India. They form part of the Cardamom Hills and are known for their lush forests, tea plantations, and rich biodiversity. The highest peak in this range is Anamudi (2,695 meters), the tallest peak in South India. The region is home to wildlife sanctuaries like the Anamalai Tiger Reserve, which protects elephants, tigers, and other species."
     }, 
     { 
         coords: [
@@ -2984,7 +2984,7 @@ var polygons = [
             ]
           ], 
         text: "mahendragiri",
-        description: ""
+        description: "Mahendragiri (1,501 meters) is the highest peak in the Eastern Ghats. It is located in Odisha, India, near the border with Andhra Pradesh. The mountain is part of the Eastern Ghats range, which runs along India's eastern coast."
     }, 
     { 
         coords: [
@@ -3150,7 +3150,7 @@ var polygons = [
             ]
           ], 
         text: "rakaposhi",
-        description: ""
+        description: "Rakaposhi is a 7,788-meter mountain located in the Karakoram Range of Gilgit-Baltistan, Pakistan. It is the 27th highest peak in the world and is known for its dramatic rise of over 5,800 meters from the Hunza Valley, making it one of the steepest mountain faces on Earth. The peak is surrounded by glaciers, including the Barpu, Biro, and Pisan glaciers. Rakaposhi is part of the Himalayan orogenic system, formed by the collision of the Indian and Eurasian tectonic plates."
     }, 
     { 
         coords: [
@@ -3316,7 +3316,7 @@ var polygons = [
           ]
         ], 
         text: "nanga parbat",
-        description: ""
+        description: "Nanga Parbat, standing at 8,126 meters, is the ninth-highest mountain in the world and the westernmost peak of the Himalayas. It is located in the Gilgit-Baltistan region of Pakistan and is known for its massive Rupal Face, one of the tallest mountain faces in the world. It is surrounded by the Indus River to the north and west, creating a dramatic rise from the valley floor. Nanga Parbat has a notorious reputation for its high fatality rate, earning it the nickname 'Killer Mountain' due to the many climbers who have perished attempting its ascent. The first successful climb was in 1953 by Hermann Buhl of Austria."
     }, 
     { 
         coords: [
@@ -3482,7 +3482,7 @@ var polygons = [
           ]
         ], 
         text: "k²",
-        description: ""
+        description: "K², also known as Mount Godwin-Austen or Chhogori, is the second-highest mountain in the world, standing at 8,611 meters. It is located in the Karakoram range on the border between Pakistan and China. K2 is known for its steep, rocky slopes and extreme weather conditions, making it one of the most difficult and dangerous mountains to climb. Unlike Mount Everest, K2 lacks a long, gradual ascent, and climbers face constant technical challenges, including icefalls, avalanches, and unpredictable storms. Due to its high fatality rate, it is often called the 'Savage Mountain'."
     }, 
     { 
         coords: [
@@ -3648,7 +3648,7 @@ var polygons = [
           ]
         ], 
         text: "namcha barwa",
-        description: ""
+        description: "Namcha Barwa, standing at 7,756 meters, is a prominent peak in the eastern Himalayas, located in Tibet, China. It marks the easternmost anchor of the Himalayan range and is situated near the Yarlung Tsangpo River, which forms the deepest gorge in the world as it bends around the mountain. The peak is known for its dramatic rise from the surrounding terrain, making it one of the most topographically prominent mountains in the world. The region experiences heavy rainfall and dense vegetation, contributing to its challenging and remote nature. Namcha Barwa was first successfully climbed in 1992 after multiple failed attempts due to its difficult conditions. It is considered sacred in Tibetan culture and remains an awe-inspiring sight in the eastern Himalayas."
     }, 
     { 
         coords: [

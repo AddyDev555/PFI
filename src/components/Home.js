@@ -12,6 +12,8 @@ export default function Home() {
         const instructionCon = document.querySelector(".instructionCon");
         const leftArrow = document.querySelector(".leftArrow");
         const rightArrow = document.querySelector(".rightArrow");
+
+        if (!instructionCon || !leftArrow || !rightArrow) return;
     
         instructionCon.classList.toggle("collapsed");
     
@@ -23,10 +25,13 @@ export default function Home() {
 
     useEffect(() => {
         const checkStorage = setInterval(() => {
-            let ratio = localStorage.getItem("matchResult");
+            let ratio = parseFloat(localStorage.getItem("matchResult")) || 0;
             let medal = document.getElementById("medal");
             let medalName = document.getElementById("medalName");
             let medal_con = document.querySelector(".medal_con");
+
+            if (!medal || !medalName || !medal_con) return;
+
             if(ratio >= 50){
                 setMatchResult(`Score: ${ratio}%, Good Job! you are an above Average Student you can perform better!`);
                 medal.classList.add("fi-ss-first-medal");
@@ -68,14 +73,13 @@ export default function Home() {
             
                             <div className="himalayas_drawCon">
 
-                                <h2>Himalayan Ranges</h2>
                                 <span className='activityHeader'>Activity 1: Coloring</span>
-                                <p>Paint the Himalayan Mountain Ranges, Plateau and Costal Regions of India. To start painting, select the pencil icon and drag the mouse on the appropriate regions.</p>
+                                <p className="instructions">Paint the Mountains and Ranges of India. To start painting, select the pencil icon and drag the mouse on the appropriate regions.</p>
                                 <p className="subTit">If the coloring is done, submit your answer by clicking the Compare icon.</p>
                                 <h2>Result will be displayed below</h2>
                                 <p className="subTit">{matchResult}</p>
                                 <div className="medal_con">
-                                    <i id="medal" class="fi"></i>
+                                    <i id="medal" className="fi"></i>
                                 </div>
                                 <h2 id="medalName"></h2>
                             </div>
@@ -87,12 +91,21 @@ export default function Home() {
 
                                 <span className='activityHeader'>Activity 2: Drag and Drop</span>
                                 <p className="instructions">
-                                    Drag the names of the Himalayan ranges to their correct locations on the map.
-                                    The Himalayas are divided into three major ranges: the Great Himalayas, the Lesser Himalayas, and the Shivalik Hills.
+                                    Drag the names of the Ranges and Mountains to their correct locations on the map.
                                     Carefully place each range in the correct position to test your knowledge of their geography.
-                                    Once you've arranged them, click the "Submit" button to check your answers!
                                 </p>
                             </div>
+                    )}
+
+                    {id === 3 && (
+                    
+                        <div className="himalayasDragAndDropCon">
+
+                            <span className='activityHeader'>Guide: Hover to Information</span>
+                            <p className="instructions">
+                                    Hover or Click Mountains and Ranges to get their Geographical Information.
+                            </p>
+                        </div>
                     )}
 
                 </div>
