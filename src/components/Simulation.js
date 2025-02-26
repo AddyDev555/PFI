@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import "./css/Home.css";
+import "./css/Simulation.css";
 import DASmap from './DASmap';
 import DADmap from './DADmap';
 import HTImap from './HTImap';
 
-export default function Home() {
-    const [id, setId] = useState(1);
+export default function Simulation() {
+    const [ActiveMap, setActiveMap] = useState(1);
     const [matchResult, setMatchResult] = useState(localStorage.getItem("matchResult") || "Waiting...");
 
     function toggleInsContainer() {
@@ -52,15 +52,14 @@ export default function Home() {
     }, []);
 
     return (
-        <main>
             <div className="simulationCon">
                 <i onClick={toggleInsContainer} className="fi fi-rr-angle-small-right rightArrow"></i>
                 <div className="instructionCon">
 
                     <div className="switchButtons">
-                        <button onClick={() => setId(1)} className={id === 1 ? "active" : ""}>Activity 1</button>
-                        <button onClick={() => setId(2)} className={id === 2 ? "active" : ""}>Activity 2</button>
-                        <button onClick={() => setId(3)} className={id === 3 ? "active" : ""}>Activity 3</button>
+                        <button onClick={() => setActiveMap(1)} className={ActiveMap === 1 ? "active" : ""}>Activity 1</button>
+                        <button onClick={() => setActiveMap(2)} className={ActiveMap === 2 ? "active" : ""}>Activity 2</button>
+                        <button onClick={() => setActiveMap(3)} className={ActiveMap === 3 ? "active" : ""}>Guide</button>
                     </div>
 
                     <div className="insHeader">
@@ -69,7 +68,7 @@ export default function Home() {
                     </div>
                     <hr />
                     
-                    {id === 1 && (
+                    {ActiveMap === 1 && (
             
                             <div className="himalayas_drawCon">
 
@@ -85,7 +84,7 @@ export default function Home() {
                             </div>
                     )}
 
-                    {id === 2 && (
+                    {ActiveMap === 2 && (
                     
                             <div className="himalayasDragAndDropCon">
 
@@ -97,7 +96,7 @@ export default function Home() {
                             </div>
                     )}
 
-                    {id === 3 && (
+                    {ActiveMap === 3 && (
                     
                         <div className="himalayasDragAndDropCon">
 
@@ -111,12 +110,11 @@ export default function Home() {
                 </div>
 
                 <div className="mainCon">
-                    {id === 1 && <DASmap />}
-                    {id === 2 && <DADmap />}
-                    {id === 3 && <HTImap />}
+                    {ActiveMap === 1 && <DASmap />}
+                    {ActiveMap === 2 && <DADmap />}
+                    {ActiveMap === 3 && <HTImap />}
                 </div>
 
             </div>
-        </main>
     );
 }

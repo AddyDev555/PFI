@@ -12,7 +12,7 @@
 }
 
 .simulationCon {
-    width: 80%;
+    width: 95%;
     height: 85vh;
     margin: auto;
     margin-top: 3.55%;
@@ -58,6 +58,7 @@
 .instructionCon {
     transition: transform 0.3s ease-in-out;
 }
+
 .instructionCon.collapsed {
     transform: translateX(-500px);
 }
