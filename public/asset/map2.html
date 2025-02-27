@@ -348,22 +348,20 @@
                 }
             });
 
-            let message = '';
+            let score = 0;
 
             if (wrongAnswers.length > 0) {
-                message = "Incorrect Answers:\n";
-                wrongAnswers.forEach(wrong => {
-                    message += `Your answer: ${wrong.given}\nCorrect answer: ${wrong.correct}\n\n`;
-                });
-                message += `Score: ${correctAnswers} / ${totalQuestions}`;
+
+                score = correctAnswers/totalQuestions * 100;
+                
             } else if (correctAnswers == 0) {
-                message = "No Answers are provided!";
+                score = 0;
             } else {
-                message = "All answers are correct! 🎉";
+                score = 0;
             }
 
-            alert(message);
-
+            const data = { value: score.toFixed(2) };
+            window.parent.postMessage(data, "*");
         }
 
         document.getElementById('compareDraw').addEventListener('click', calculateScore);

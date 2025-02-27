@@ -365,6 +365,7 @@
 
             document.getElementById('compareDraw').addEventListener('click', function () {  
                 map.setView([19.0760, 72.8777], 4); 
+                window.updateOpacity(1);
 
                 map.once('moveend', function () { 
                     setTimeout(() => {
@@ -387,7 +388,10 @@
 
                         const overlapRatio = overlayPixels ? (overlapPixels / overlayPixels).toFixed(2) : 0;
                         let overlapRatioSend = (overlapRatio * 100)
-                        localStorage.setItem("matchResult", overlapRatioSend);
+                        
+                        const data = { value: overlapRatioSend };
+                        window.parent.postMessage(data, "*");
+
                     }, 2000); 
                 });
             });

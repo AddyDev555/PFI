@@ -6,7 +6,7 @@ import HTImap from './HTImap';
 
 export default function Simulation() {
     const [ActiveMap, setActiveMap] = useState(1);
-    const [matchResult, setMatchResult] = useState(localStorage.getItem("matchResult") || "Waiting...");
+    const [matchResult, setMatchResult] = useState("Waiting...");
     const [prevRatio, setPrevRatio] = useState(null); 
 
     function toggleInsContainer() {
@@ -25,41 +25,53 @@ export default function Simulation() {
     }    
 
     useEffect(() => {
-        const checkStorage = setInterval(() => {
-            let ratio = parseFloat(localStorage.getItem("matchResult")).toFixed(2) || 0;
-            console.log(ratio);
+        const handleMessage = (event) => {
+
+            if (event.data.payload) return;
+            
+            let ratio = event.data?.value || 0;
             let medal = document.getElementById("medal");
             let medalName = document.getElementById("medalName");
             let medal_con = document.querySelector(".medal_con");
-
-            if (!medal || !medalName || !medal_con) return; 
-
+    
+            if (!medal || !medalName || !medal_con) return;
+    
             const instructionCon = document.querySelector(".instructionCon");
+    
+            setPrevRatio((prev) => {
+                if (prev === ratio) return prev; 
+    
+                if (instructionCon && instructionCon.classList.contains("collapsed")) {
+                    toggleInsContainer();
+                }
+    
+                if (ratio >= 50) {
+                    setMatchResult(`Score: ${ratio}%, Good Job!`);
+                    medal.classList.add("fi-ss-first-medal", "medal1");
+                    medal_con.style.opacity = 1;
+                    medalName.textContent = "You Won a Gold Medal";
+                } else {
+                    setMatchResult(`Score: ${ratio}%, Keep trying!`);
+                    medal.classList.add("fi-ss-second-medal", "medal2");
+                    medal_con.style.opacity = 1;
+                    medalName.textContent = "You Won a Silver Medal";
+                }
+    
+                return ratio; 
+            });
 
-            if (instructionCon && instructionCon.classList.contains("collapsed") && ratio !== prevRatio) {
-                toggleInsContainer();
-            }
-
-            if (ratio >= 50) {
-                setMatchResult(`Score: ${ratio}%, Good Job! you are an above Average Student you can perform better!`);
-                medal.classList.add("fi-ss-first-medal");
-                medal.classList.add("medal1");
-                medal_con.style.opacity = 1;
-                medalName.textContent = "You Won a Gold Medal";
-            } 
-            else if (ratio <= 50 && ratio >= 0) {
-                setMatchResult(`Score: ${ratio}%, Not Bad! Keep trying, I know you will get it for sure.`);
-                medal.classList.add("fi-ss-second-medal");
-                medal.classList.add("medal2");
-                medal_con.style.opacity = 1;
-                medalName.textContent = "You Won a Silver Medal";
-            }
-
-            setPrevRatio(ratio);
-        }, 1000);
-
-        return () => clearInterval(checkStorage);
+        };
+    
+        window.addEventListener("message", handleMessage);
+    
+        return () => {
+            window.removeEventListener("message", handleMessage);
+        };
     }, [prevRatio]);
+    
+    useEffect(() => {
+        setMatchResult("Waiting...");
+    }, [ActiveMap]);
 
     return (
             <div className="simulationCon">
@@ -85,6 +97,7 @@ export default function Simulation() {
                                 <span className='activityHeader'>Activity 1: Coloring</span>
                                 <p className="instructions">Paint the Mountains and Ranges of India. To start painting, select the pencil icon and drag the mouse on the appropriate regions.</p>
                                 <p className="subTit">If the coloring is done, submit your answer by clicking the Compare icon.</p>
+
                                 <h2>Result will be displayed below</h2>
                                 <p className="subTit">{matchResult}</p>
                                 <div className="medal_con">
@@ -96,13 +109,20 @@ export default function Simulation() {
 
                     {ActiveMap === 2 && (
                     
-                            <div className="himalayasDragAndDropCon">
+                            <div className="himalayas_drawCon">
 
                                 <span className='activityHeader'>Activity 2: Drag and Drop</span>
                                 <p className="instructions">
                                     Drag the names of the Ranges and Mountains to their correct locations on the map.
                                     Carefully place each range in the correct position to test your knowledge of their geography.
                                 </p>
+
+                                <h2>Result will be displayed below</h2>
+                                <p className="subTit">{matchResult}</p>
+                                <div className="medal_con">
+                                    <i id="medal" className="fi"></i>
+                                </div>
+                                <h2 id="medalName"></h2>
                             </div>
                     )}
 
