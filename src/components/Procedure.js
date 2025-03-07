@@ -62,6 +62,11 @@ export default function Procedure() {
                     <img src="/procedure_imgs/2_(2).png" alt="Activity 2 Image 2" />
                     <strong>Fig. 2: Activity 2 Image 2</strong>
                 </li>
+                <li>
+                    The bottom section displays correctly matched pairs.  
+                    <img src="/procedure_imgs/2_(3).png" alt="Activity 2 Image 3" />
+                    <strong>Fig. 2: Activity 3 Image 3</strong>
+                </li>
                 <li>For reference, sea port locations are indicated on the map by a ship symbol.</li>
             </ol>
 

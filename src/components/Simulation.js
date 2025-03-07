@@ -27,39 +27,43 @@ export default function Simulation() {
     useEffect(() => {
         const handleMessage = (event) => {
 
-            if (event.data.payload) return;
+            if (event.data.payload || !event.data) return;
             
-            let ratio = event.data?.value || 0;
-            let medal = document.getElementById("medal");
-            let medalName = document.getElementById("medalName");
-            let medal_con = document.querySelector(".medal_con");
-    
-            if (!medal || !medalName || !medal_con) return;
-    
-            const instructionCon = document.querySelector(".instructionCon");
-    
-            setPrevRatio((prev) => {
-                if (prev === ratio) return prev; 
-    
-                if (instructionCon && instructionCon.classList.contains("collapsed")) {
-                    toggleInsContainer();
-                }
-    
-                if (ratio >= 50) {
-                    setMatchResult(`Score: ${ratio}%, Good Job!`);
-                    medal.classList.add("fi-ss-first-medal", "medal1");
-                    medal_con.style.opacity = 1;
-                    medalName.textContent = "You Won a Gold Medal";
-                } else {
-                    setMatchResult(`Score: ${ratio}%, Keep trying!`);
-                    medal.classList.add("fi-ss-second-medal", "medal2");
-                    medal_con.style.opacity = 1;
-                    medalName.textContent = "You Won a Silver Medal";
-                }
-    
-                return ratio; 
-            });
+            if (event.data.value !== undefined) {
+                let ratio = event.data.value;
+     
+                setPrevRatio((prev) => {
+        
+                    if (prev === ratio) return prev;
 
+                    let medal = document.getElementById("medal");
+                    let medalName = document.getElementById("medalName");
+                    let medal_con = document.querySelector(".medal_con");
+                    const instructionCon = document.querySelector(".instructionCon");
+                    
+                    if (!medal || !medalName || !medal_con) return prev;
+
+                    medal.className = "fi";
+                    
+                    if (instructionCon && instructionCon.classList.contains("collapsed")) {
+                        toggleInsContainer();
+                    }
+
+                    if (ratio >= 50) {
+                        setMatchResult(`Score: ${ratio}%, Good Job!`);
+                        medal.classList.add("fi-ss-first-medal", "medal1");
+                        medal_con.style.opacity = 1;
+                        medalName.textContent = "You Won a Gold Medal";
+                    } else {
+                        setMatchResult(`Score: ${ratio}%, Keep trying!`);
+                        medal.classList.add("fi-ss-second-medal", "medal2");
+                        medal_con.style.opacity = 1;
+                        medalName.textContent = "You Won a Silver Medal";
+                    }
+                    
+                    return ratio;
+                });
+            }
         };
     
         window.addEventListener("message", handleMessage);
