@@ -102,8 +102,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: auto;
-    margin: 20px 0; 
+    height: 80vh;
+    margin: 10px 0; 
 }
   

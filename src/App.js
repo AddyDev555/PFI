@@ -3,6 +3,7 @@ import "../src/components/css/App.css";
 import Theory from "./components/Theory"
 import Procedure from "./components/Procedure"
 import Simulation from "./components/Simulation";
+import Self_Evaluation from "./components/Self_Evaluation";
 
 function App() {
   const [ActiveTab, setActiveTab] = useState(1);
@@ -96,11 +97,13 @@ function App() {
 
         {ActiveTab === 3 && 
           <div className="video-container">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/Y1HOrfks1c4?si=H33yoaC4ez5uORVr" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <iframe width="80%" height="100%" src="https://www.youtube.com/embed/Y1HOrfks1c4?si=H33yoaC4ez5uORVr" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
           </div>
         }
 
         {ActiveTab === 4 && <Simulation />}
+
+        {ActiveTab === 5 && <Self_Evaluation />}
 
         {ActiveTab === 6 && 
           <p>
