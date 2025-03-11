@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, NavLink, Navigate } from "react-router-dom";
 import "../src/components/css/App.css";
 import Theory from "./components/Theory";
 import Procedure from "./components/Procedure";
@@ -54,6 +54,9 @@ function App() {
           </div>
 
           <Routes>
+  
+            <Route path="/" element={<Navigate to="/theory" replace />} />
+            
             <Route path="/theory" element={<Theory />} />
             <Route path="/procedure" element={<Procedure />} />
             <Route
