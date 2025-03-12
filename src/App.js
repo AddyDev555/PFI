@@ -79,6 +79,23 @@ function App() {
                 </p>
               }
             />
+            <Route
+              path="/feedback"
+              element={
+              <>
+                <p>
+                  <a href="https://www.linkedin.com/in/ojas-vishe-3350b3288/" target="_blank" className="styled-link">
+                    • Ojas Prashant Vishe
+                  </a>
+                </p>
+                <p>
+                  <a href="https://www.linkedin.com/in/aditya-patil-b5a9b425a/" target="_blank" className="styled-link">
+                    • Aditya Deepak Patil
+                  </a>
+                </p>
+              </>
+              }
+            />
           </Routes>
         </div>
       </div>

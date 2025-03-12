@@ -249,7 +249,7 @@
                                             closestDistance = distance;
                                             foundPolygon = layer;
                                         }
-                                    }
+                                    } 
                                 }
                             });
                         }
@@ -292,6 +292,14 @@
                                 className: 'leaflet-tooltip-custom'
                             });
                         }
+                    } else {
+                        const previousItem = document.createElement('div');
+                        previousItem.classList.add('draggable');
+                        previousItem.textContent = draggedItem.textContent;
+                        list.appendChild(previousItem);
+
+                        previousItem.addEventListener('mousedown', startDrag);
+                        previousItem.addEventListener('touchstart', startDrag, { passive: false });
                     }
 
                     draggedItem.remove();
@@ -314,15 +322,42 @@
             let wrongAnswers = [];
 
             map.eachLayer(layer => {
-                if (layer instanceof L.Polygon) {
+                if (layer instanceof L.Polygon || layer instanceof L.GeoJSON) {  
                     totalQuestions++;
 
-                    const originalPolygon = polygons.find(p => {
-                        return p.coords.some(coord => 
-                            coord[0] === layer.getLatLngs()[0][0].lat && 
-                            coord[1] === layer.getLatLngs()[0][0].lng
-                        );
-                    });
+                    const layerCoords = layer.getLatLngs();
+                    let flatCoords = null;
+                    let originalPolygon = null;
+
+                    if (layerCoords.length > 1) {  
+                        flatCoords = layerCoords.flat(Infinity);
+
+                        originalPolygon = polygons.find(p => {
+                            return p.coords.some(coordGroup =>  
+                                coordGroup.some(coord => 
+                                    flatCoords.some(point => 
+                                        point.lat === coord[0] && point.lng === coord[1]
+                                    )
+                                )
+                            );
+                        });
+
+                    } else {  
+                        flatCoords = layerCoords.flat();
+                        
+                        originalPolygon = polygons.find(p => {
+                            return p.coords.some(coord => 
+                                layer.getLatLngs().some(ring =>
+                                    ring.some(point => 
+                                        point.lat === coord[0] && point.lng === coord[1]
+                                    )
+                                )
+                            );
+                        });
+
+                    }
+
+
 
                     if (!originalPolygon) return;
 
@@ -334,17 +369,23 @@
                         currentText = tooltip ? tooltip.getContent() : '';
                     }
 
+                    let Color = "blue"; 
+
                     if (currentText.toLowerCase() === originalPolygon.text.toLowerCase()) {
                         correctAnswers++;
-                    } else if (currentText) {  
+                        Color = "green";
 
+                    } else if (currentText) {
                         let formattedText = originalPolygon.text.replace(/\b\w/g, char => char.toUpperCase()); 
-
-                        wrongAnswers.push({
-                            given: currentText,
-                            correct: formattedText
-                        });
+                        wrongAnswers.push({ given: currentText, correct: formattedText });
+                        Color = "red";
                     }
+
+                    layer.setStyle({ 
+                        color: Color,  
+                        fillColor: Color, 
+                        fillOpacity: 1
+                    });
                 }
             });
 
