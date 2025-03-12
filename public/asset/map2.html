@@ -390,15 +390,8 @@
             });
 
             let score = 0;
-
-            if (wrongAnswers.length > 0) {
-
-                score = correctAnswers/totalQuestions * 100;
-                
-            } else if (correctAnswers == 0) {
-                score = 0;
-            } else {
-                score = 0;
+            if (totalQuestions > 0) {  
+                score = (correctAnswers / totalQuestions) * 100;
             }
 
             const data = { value: score.toFixed(2) };
